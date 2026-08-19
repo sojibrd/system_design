@@ -203,7 +203,33 @@ export function readDoc(doc: Doc): string {
   return fs.readFileSync(path.join(ROOT, doc.file), "utf8");
 }
 
-export function parseDocContent(raw: string): { title: string; source?: string; body: string } {
+export type HeadingItem = {
+  id: string;
+  text: string;
+  level: number;
+};
+
+export function extractHeadings(markdown: string): HeadingItem[] {
+  const headings: HeadingItem[] = [];
+  const lines = markdown.split(/\r?\n/);
+  for (const line of lines) {
+    const match = /^(#{2,3})\s+(.+)$/.exec(line);
+    if (match) {
+      const level = match[1].length;
+      const rawText = match[2].trim().replace(/[*_`]/g, "");
+      const id = slugify(rawText);
+      headings.push({ id, text: rawText, level });
+    }
+  }
+  return headings;
+}
+
+export function parseDocContent(raw: string): {
+  title: string;
+  source?: string;
+  body: string;
+  headings: HeadingItem[];
+} {
   const lines = raw.split(/\r?\n/);
   let title = "";
   let source: string | undefined;
@@ -228,10 +254,14 @@ export function parseDocContent(raw: string): { title: string; source?: string; 
     bodyLines.push(line);
   }
 
+  const body = bodyLines.join("\n").trim();
+  const headings = extractHeadings(body);
+
   return {
     title: title || "ডকুমেন্টেশন",
     source,
-    body: bodyLines.join("\n").trim(),
+    body,
+    headings,
   };
 }
 

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import DocArticle from "@/app/components/DocArticle";
-import { getDocBySlug, getPages, getSiblings, readDoc } from "@/app/lib/content";
+import { getDocBySlug, getPages, getSiblings, readDoc, parseDocContent } from "@/app/lib/content";
 
 export const dynamicParams = false;
 
@@ -33,5 +33,20 @@ export default async function DocPage({
   }
 
   const { prev, next } = getSiblings(doc);
-  return <DocArticle doc={doc} content={readDoc(doc)} prev={prev} next={next} />;
+  const raw = readDoc(doc);
+  const { title, source, body, headings } = parseDocContent(raw);
+  const displayTitle = doc.isIndex ? doc.title : title || doc.title;
+
+  return (
+    <DocArticle
+      doc={doc}
+      displayTitle={displayTitle}
+      source={source}
+      body={body}
+      headings={headings}
+      prev={prev}
+      next={next}
+    />
+  );
 }
+

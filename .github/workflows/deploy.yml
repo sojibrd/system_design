@@ -28,11 +28,22 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # ডেটা-স্তরের যাচাই — TypeScript যা ধরতে পারে না (mermaid সিনট্যাক্স,
+      # step-এর node/edge রেফারেন্স)। build-এর আগে, যাতে ভাঙা ডেটা deploy না হয়।
+      - name: Check diagrams
+        run: npm run check:diagrams
+
+      - name: Check simulations
+        run: npm run check:simulations
 
       - name: Build and Export
         run: npm run build

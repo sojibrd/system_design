@@ -7,13 +7,19 @@
  *
  * চালান: npm run check:simulations
  */
-import { pathToFileURL } from "node:url";
-import { resolve } from "node:path";
+import { pathToFileURL, fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 
-const MODULES = [
-  "app/lib/simulations/url-shortener/index.ts",
-  "app/lib/simulations/rate-limiter/index.ts",
-];
+/**
+ * তালিকাটা হাতে লেখা নয় — `simulationIndex` থেকেই আসে। নইলে নতুন সিমুলেশন যোগ
+ * করলে স্ক্রিপ্ট সেটা নীরবে বাদ দিয়ে "সব ঠিক" বলত, অর্থাৎ যে জালটা ভুল ধরার
+ * জন্য, সেটাই মিথ্যা আশ্বাস দিত।
+ */
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const registryPath = resolve(repoRoot, "app/lib/simulations/index.ts");
+const { simulationIndex, loadSimulation } = await import(
+  pathToFileURL(registryPath).href
+);
 
 let broken = 0;
 let warnings = 0;
@@ -23,13 +29,15 @@ const fail = (msg) => {
   broken++;
 };
 
-for (const relative of MODULES) {
-  const mod = await import(pathToFileURL(resolve(relative)).href);
-  const sim = Object.values(mod).find((value) => value && value.levels);
+for (const summary of simulationIndex) {
+  const sim = await loadSimulation(summary.id);
 
-  if (!sim) {
-    fail(`${relative}: কোনো SimulationConfig export পাওয়া যায়নি`);
+  if (!sim || !sim.levels) {
+    fail(`${summary.id}: কোনো SimulationConfig পাওয়া যায়নি`);
     continue;
+  }
+  if (sim.id !== summary.id) {
+    fail(`${summary.id}: config-এর id "${sim.id}" — registry-র slug-এর সাথে মিলছে না`);
   }
 
   for (const level of sim.levels) {
@@ -45,6 +53,9 @@ for (const relative of MODULES) {
       }
     }
 
+    const usedNodeIds = new Set();
+    const usedEdgeIds = new Set();
+
     for (const flow of level.flows) {
       for (const step of flow.steps) {
         const at = `${where}/${step.id}`;
@@ -53,9 +64,11 @@ for (const relative of MODULES) {
           fail(`${at}: flowType "${step.flowType}" ≠ flow "${flow.id}"`);
         }
         for (const id of step.activeNodeIds ?? []) {
+          usedNodeIds.add(id);
           if (!nodeIds.has(id)) fail(`${at}: activeNode "${id}" নেই`);
         }
         for (const id of step.activeEdgeIds ?? []) {
+          usedEdgeIds.add(id);
           if (!edgeIds.has(id)) fail(`${at}: activeEdge "${id}" নেই`);
         }
         for (const id of Object.keys(step.edgeOverrides ?? {})) {
@@ -67,12 +80,24 @@ for (const relative of MODULES) {
       }
     }
 
+    // ক্যানভাসে আছে কিন্তু কোনো ধাপে কখনো জ্বলে না — ঝুলে থাকা বাক্স বা তার।
+    const warn = (msg) => {
+      console.log(`⚠ ${msg}`);
+      warnings++;
+    };
+
+    for (const id of nodeIds) {
+      if (!usedNodeIds.has(id)) warn(`${where}: node "${id}" কোনো ধাপে সক্রিয় হয় না`);
+    }
+    for (const id of edgeIds) {
+      if (!usedEdgeIds.has(id)) warn(`${where}: edge "${id}" কোনো ধাপে সক্রিয় হয় না`);
+    }
+
     // ভুল হলে build ভাঙার মতো নয়, কিন্তু ডিজাইন নোটে ভুল সংখ্যা দেখায়।
     if (level.componentCount !== level.nodes.length) {
-      console.log(
-        `⚠ ${where}: componentCount ${level.componentCount}, কিন্তু node আছে ${level.nodes.length}টি`
+      warn(
+        `${where}: componentCount ${level.componentCount}, কিন্তু node আছে ${level.nodes.length}টি`
       );
-      warnings++;
     }
   }
 

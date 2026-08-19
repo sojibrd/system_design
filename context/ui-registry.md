@@ -80,7 +80,7 @@
 ১. `app/lib/simulations/<slug>/` — level ফাইল লিখুন, `<slug>/index.ts`-এ `SimulationConfig` এক্সপোর্ট করুন
 ২. `app/lib/simulations/index.ts`-এ দুটো লাইন — `simulationIndex`-এ সারাংশ, `loaders`-এ dynamic import
 ৩. নতুন flow হলে `FlowKind` / `FlowIcon` union-এ সদস্য, `ControlsBar`-এর `flowIcons` ও `WalkthroughPanel`-এর `flowBadge` map-এ এন্ট্রি
-৪. `npm run check:simulations` চালান — step-এর সব node/edge আইডি সত্যিই আছে কিনা যাচাই করে
+৪. `npm run check:simulations` চালান — step-এর সব node/edge আইডি সত্যিই আছে কিনা, flowType মেলে কিনা, `componentCount` ঠিক কিনা, এবং কোনো node/edge ঝুলে আছে কিনা যাচাই করে। স্ক্রিপ্টটা `simulationIndex` থেকেই তালিকা নেয়, তাই নতুন সিমুলেশন নিজে থেকেই এর আওতায় আসে — স্ক্রিপ্ট সম্পাদনার দরকার নেই। CI-ও (`deploy.yml`) এটি build-এর আগে চালায়।
 
 এর বেশি কিছু লাগে না: রুট (`/simulation/<slug>/`) `generateStaticParams` থেকে নিজেই তৈরি হয়, এবং `SimulationPicker` দুই বা তার বেশি এন্ট্রি দেখলে স্থির প্লেট থেকে dropdown-এ বদলে যায়।
 

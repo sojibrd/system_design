@@ -1,4 +1,4 @@
-import { SimulationConfig, SimulationSummary } from "../types";
+import type { SimulationConfig, SimulationSummary } from "../types";
 
 /**
  * Every system this simulator can walk through.

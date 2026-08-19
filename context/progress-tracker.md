@@ -186,7 +186,7 @@ _কিছু নেই — ফেজ ০ ও ফেজ ১ সম্পূর�
 
 ### দ্বিতীয় সিমুলেশন — Rate Limiter (২০২৬-০৮-২০)
 
-- [x] `app/lib/simulations/rate-limiter/` — ৩ লেভেল, ২৭ ধাপ, ৭টি trade-off সেট
+- [x] `app/lib/simulations/rate-limiter/` — ৩ লেভেল, ২৭ ধাপ, ১২টি trade-off (প্রতি লেভেলে ৪টি)
   - functional: fixed window, in-memory counter, 429 + Retry-After (৩ node)
   - scalable: LB + ৩ সার্ভার + Redis, atomic INCR/Lua, sliding window counter (৭ node)
   - reliable: token bucket lease, Redis replica + Sentinel, fail-open নীতি, hot key sharding (৮ node)

@@ -129,7 +129,14 @@ export default function ProgressClient({
           <span className="t-label">সার্বিক সম্পূর্ণতা</span>
           <span className="t-mono t-accent text-sm">{percentage}%</span>
         </div>
-        <div className="gauge h-3 w-full">
+        <div
+          role="progressbar"
+          aria-valuenow={percentage}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="সার্বিক সম্পূর্ণতা"
+          className="gauge h-3 w-full"
+        >
           <div className="gauge-fill" style={{ width: `${percentage}%` }} />
         </div>
 
@@ -148,7 +155,14 @@ export default function ProgressClient({
                     {secRead}/{secTotal} ({secPct}%)
                   </span>
                 </div>
-                <div className="gauge h-2 w-full">
+                <div
+                  role="progressbar"
+                  aria-valuenow={secPct}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`${sec.title} সম্পূর্ণতা`}
+                  className="gauge h-2 w-full"
+                >
                   <div className="gauge-fill" data-tone="ok" style={{ width: `${secPct}%` }} />
                 </div>
               </div>
@@ -174,8 +188,11 @@ export default function ProgressClient({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="t-label">সেকশন</span>
+          <label htmlFor="progress-section-filter" className="t-label">
+            সেকশন
+          </label>
           <select
+            id="progress-section-filter"
             value={activeSection}
             onChange={(e) => setActiveSection(e.target.value)}
             className="control px-3 py-1.5 text-xs"

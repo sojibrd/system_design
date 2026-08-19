@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { LevelId, SimulationConfig, SimulationSummary } from "@/app/lib/types";
+import type { LevelId, SimulationConfig, SimulationSummary } from "@/app/lib/types";
 import { useSimulation } from "@/app/hooks/useSimulation";
 import { Header } from "@/app/components/simulation/Header";
 import {
@@ -82,6 +82,40 @@ export const SimulationView: React.FC<{
     setFlowType,
   } = useSimulation(currentLevel);
 
+  // Keyboard navigation shortcuts (ArrowLeft / ArrowRight / Space)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        prevStep();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        nextStep();
+      } else if (e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        if (isPlaying) {
+          pause();
+        } else {
+          play();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [prevStep, nextStep, play, pause, isPlaying]);
+
   return (
     /* `h-full`, not `h-dvh`: the height this fills is what the site shell
        leaves after the sidebar and the mobile top bar, not the viewport. */
@@ -93,8 +127,12 @@ export const SimulationView: React.FC<{
         onSelectSimulation={(id) => router.push(`/simulation/${id}/`)}
       />
 
-      {/* Main Container — fills exactly what the header leaves behind */}
-      <main className="flex-1 min-h-0 w-full px-2 sm:px-3 md:px-5 lg:px-6 py-2 md:py-3 flex flex-col gap-2 md:gap-3">
+      {/* Stage Container — fills exactly what the header leaves behind */}
+      <div
+        role="region"
+        aria-label="সিমুলেশন ভিউয়ার"
+        className="flex-1 min-h-0 w-full px-2 sm:px-3 md:px-5 lg:px-6 py-2 md:py-3 flex flex-col gap-2 md:gap-3"
+      >
         {/* Level Selector Tabs */}
         <div className="shrink-0">
           <LevelTabs
@@ -138,7 +176,7 @@ export const SimulationView: React.FC<{
           <Sheet
             open={openPanel !== null}
             onClose={() => setActivePanel(null)}
-            label={openPanel === "notes" ? "Design notes" : "Step walkthrough"}
+            label={openPanel === "notes" ? "ডিজাইন নোট" : "ধাপে ধাপে ওয়াকথ্রু"}
             className="min-h-0 lg:col-span-5 xl:col-span-4"
           >
             {openPanel === "notes" ? (
@@ -183,7 +221,7 @@ export const SimulationView: React.FC<{
             hasNotes={levelHasNotes}
           />
         </div>
-      </main>
+      </div>
     </div>
   );
 };

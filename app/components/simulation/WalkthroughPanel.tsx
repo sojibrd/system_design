@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { FlowKind, SimulationStep } from "@/app/lib/types";
+import type { FlowKind, SimulationStep } from "@/app/lib/types";
 import {
   BookOpen,
   Code2,
@@ -158,7 +158,7 @@ export const WalkthroughPanel: React.FC<WalkthroughPanelProps> = ({
           <IconButton
             variant="ghost"
             onClick={onClose}
-            aria-label="Close walkthrough"
+            aria-label="ব্যাখ্যা প্যানেল বন্ধ করুন"
             className="lg:hidden"
           >
             <X className="w-4 h-4" />

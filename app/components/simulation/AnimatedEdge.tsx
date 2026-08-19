@@ -6,7 +6,7 @@ import {
   EdgeProps,
   getSmoothStepPath,
 } from "@xyflow/react";
-import { SimulationEdgeData, SignalKind } from "@/app/lib/types";
+import type { SimulationEdgeData, SignalKind } from "@/app/lib/types";
 import { useThemeNumber } from "@/app/hooks/useThemeNumber";
 import { usePrefersReducedMotion } from "@/app/hooks/useMediaQuery";
 

@@ -28,8 +28,12 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
      simulator wants the width) outlives a single navigation. */
   const [collapsed, setCollapsed] = useLocalStorage<boolean>("sd_nav_collapsed", false);
 
-  // Determine which sections/parts should be open initially
-  const initialOpenParts = useMemo(() => {
+  const [userToggles, setUserToggles] = useState<Record<string, boolean>>({});
+  const [roadmapOpen, setRoadmapOpen] = useState(true);
+  const [workbookOpen, setWorkbookOpen] = useState(true);
+
+  // Active part and chapter keys for the current pathname
+  const activeKeys = useMemo(() => {
     const set = new Set<string>();
     for (const part of nav.workbook.parts) {
       for (const ch of part.chapters) {
@@ -46,17 +50,20 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
     return set;
   }, [nav, pathname]);
 
-  const [openMap, setOpenMap] = useState<Set<string>>(initialOpenParts);
-  const [roadmapOpen, setRoadmapOpen] = useState(true);
-  const [workbookOpen, setWorkbookOpen] = useState(true);
+  function isSectionOpen(key: string): boolean {
+    if (isSearching) return true;
+    if (userToggles[key] !== undefined) {
+      return userToggles[key];
+    }
+    return activeKeys.has(key);
+  }
 
   function toggleOpen(key: string) {
-    setOpenMap((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
+    const current = isSectionOpen(key);
+    setUserToggles((prev) => ({
+      ...prev,
+      [key]: !current,
+    }));
   }
 
   // Filter items if search is active
@@ -103,6 +110,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
           onClick={() => setMobileOpen((v) => !v)}
           className="control px-3 py-1.5 text-xs"
           aria-expanded={mobileOpen}
+          aria-controls="site-sidebar"
         >
           {mobileOpen ? <X size={14} /> : <Menu size={14} />}
           {mobileOpen ? "বন্ধ" : "সূচিপত্র"}
@@ -126,6 +134,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
 
       {/* The index rack */}
       <nav
+        id="site-sidebar"
         className={`${mobileOpen ? "flex" : "hidden"} ${
           collapsed ? "md:hidden" : "md:flex"
         } shrink-0 min-h-0 flex-1 md:flex-none flex-col md:w-80 surface-panel overflow-y-auto`}
@@ -175,11 +184,13 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
           {/* Quick search */}
           <div className="relative">
             <input
+              id="sidebar-search"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="টপিক বা অধ্যায় খুঁজুন..."
-              className="surface-well t-body w-full px-3 py-2 text-xs focus:outline-none"
+              aria-label="টপিক বা অধ্যায় খুঁজুন"
+              className="surface-well t-body w-full px-3 py-2 text-xs"
             />
             {search && (
               <button
@@ -193,113 +204,135 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
             )}
           </div>
 
-          {/* Section 1 — Roadmap */}
-          <div className="flex flex-col gap-1">
-            <button
-              type="button"
-              onClick={() => setRoadmapOpen((v) => !v)}
-              className="t-label flex w-full items-center justify-between py-1"
-            >
-              <span>
-                {nav.roadmap.title} ({filteredRoadmap.length})
-              </span>
-              {roadmapOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-            </button>
+          {/* Empty search state */}
+          {isSearching && filteredRoadmap.length === 0 && filteredWorkbookParts.length === 0 && (
+            <div className="surface-well t-caption p-4 text-center">
+              &ldquo;{search}&rdquo; দিয়ে কোনো অধ্যায় বা রোডম্যাপ পাওয়া যায়নি।
+            </div>
+          )}
 
-            {roadmapOpen && (
-              <ul className="flex flex-col gap-0.5 pl-2">
-                {filteredRoadmap.map((item) => {
-                  const active = normalize(item.route) === pathname;
-                  return (
-                    <li key={item.route}>
-                      <Link
-                        href={item.route}
-                        onClick={() => setMobileOpen(false)}
-                        aria-current={active ? "true" : undefined}
-                        className="row block px-2.5 py-1.5 text-xs leading-snug"
-                      >
-                        {item.title}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
+          {/* Section 1 — Roadmap */}
+          {(!isSearching || filteredRoadmap.length > 0) && (
+            <div className="flex flex-col gap-1">
+              <button
+                type="button"
+                onClick={() => setRoadmapOpen((v) => !v)}
+                aria-expanded={roadmapOpen}
+                aria-controls="roadmap-list"
+                className="t-label flex w-full items-center justify-between py-1"
+              >
+                <span>
+                  {nav.roadmap.title} ({filteredRoadmap.length})
+                </span>
+                {roadmapOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+              </button>
+
+              {roadmapOpen && (
+                <ul id="roadmap-list" className="flex flex-col gap-0.5 pl-2">
+                  {filteredRoadmap.map((item) => {
+                    const active = normalize(item.route) === pathname;
+                    return (
+                      <li key={item.route}>
+                        <Link
+                          href={item.route}
+                          onClick={() => setMobileOpen(false)}
+                          aria-current={active ? "true" : undefined}
+                          className="row block px-2.5 py-1.5 text-xs leading-snug"
+                        >
+                          {item.title}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* Section 2 — Workbook */}
-          <div className="flex flex-col gap-2 pt-2 seam-t">
-            <button
-              type="button"
-              onClick={() => setWorkbookOpen((v) => !v)}
-              className="t-label flex w-full items-center justify-between py-1"
-            >
-              <span>{nav.workbook.title}</span>
-              {workbookOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-            </button>
+          {(!isSearching || filteredWorkbookParts.length > 0) && (
+            <div className="flex flex-col gap-2 pt-2 seam-t">
+              <button
+                type="button"
+                onClick={() => setWorkbookOpen((v) => !v)}
+                aria-expanded={workbookOpen}
+                aria-controls="workbook-tree"
+                className="t-label flex w-full items-center justify-between py-1"
+              >
+                <span>{nav.workbook.title}</span>
+                {workbookOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+              </button>
 
-            {workbookOpen && (
-              <div className="flex flex-col gap-3">
-                {filteredWorkbookParts.map((part) => {
-                  const partOpen = isSearching || openMap.has(part.key);
-                  return (
-                    <div key={part.key} className="flex flex-col gap-1">
-                      <button
-                        type="button"
-                        onClick={() => toggleOpen(part.key)}
-                        className="row flex w-full items-center justify-between px-2 py-1 text-left text-xs"
-                      >
-                        <span className="truncate">{part.title}</span>
-                        {partOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
-                      </button>
+              {workbookOpen && (
+                <div id="workbook-tree" className="flex flex-col gap-3">
+                  {filteredWorkbookParts.map((part) => {
+                    const partOpen = isSectionOpen(part.key);
+                    const partContentId = `part-content-${part.key}`;
 
-                      {partOpen && (
-                        <div className="ml-2 flex flex-col gap-2 pl-2">
-                          {part.chapters.map((ch) => {
-                            const chKey = `${part.key}:${ch.key}`;
-                            const chOpen = isSearching || openMap.has(chKey);
+                    return (
+                      <div key={part.key} className="flex flex-col gap-1">
+                        <button
+                          type="button"
+                          onClick={() => toggleOpen(part.key)}
+                          aria-expanded={partOpen}
+                          aria-controls={partContentId}
+                          className="row flex w-full items-center justify-between px-2 py-1 text-left text-xs"
+                        >
+                          <span className="truncate">{part.title}</span>
+                          {partOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+                        </button>
 
-                            return (
-                              <div key={ch.key} className="flex flex-col gap-1">
-                                <button
-                                  type="button"
-                                  onClick={() => toggleOpen(chKey)}
-                                  className="row flex w-full items-center justify-between px-2 py-1 text-left text-[11px]"
-                                >
-                                  <span className="truncate">{ch.title}</span>
-                                  {chOpen ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
-                                </button>
+                        {partOpen && (
+                          <div id={partContentId} className="ml-2 flex flex-col gap-2 pl-2">
+                            {part.chapters.map((ch) => {
+                              const chKey = `${part.key}:${ch.key}`;
+                              const chOpen = isSectionOpen(chKey);
+                              const chContentId = `ch-content-${chKey}`;
 
-                                {chOpen && (
-                                  <ul className="ml-1 flex flex-col gap-0.5 pl-2">
-                                    {ch.items.map((item) => {
-                                      const active = normalize(item.route) === pathname;
-                                      return (
-                                        <li key={item.route}>
-                                          <Link
-                                            href={item.route}
-                                            onClick={() => setMobileOpen(false)}
-                                            aria-current={active ? "true" : undefined}
-                                            className="row block px-2 py-1 text-[11px] leading-snug"
-                                          >
-                                            {item.title}
-                                          </Link>
-                                        </li>
-                                      );
-                                    })}
-                                  </ul>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                              return (
+                                <div key={ch.key} className="flex flex-col gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleOpen(chKey)}
+                                    aria-expanded={chOpen}
+                                    aria-controls={chContentId}
+                                    className="row flex w-full items-center justify-between px-2 py-1 text-left text-[11px]"
+                                  >
+                                    <span className="truncate">{ch.title}</span>
+                                    {chOpen ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
+                                  </button>
+
+                                  {chOpen && (
+                                    <ul id={chContentId} className="ml-1 flex flex-col gap-0.5 pl-2">
+                                      {ch.items.map((item) => {
+                                        const active = normalize(item.route) === pathname;
+                                        return (
+                                          <li key={item.route}>
+                                            <Link
+                                              href={item.route}
+                                              onClick={() => setMobileOpen(false)}
+                                              aria-current={active ? "true" : undefined}
+                                              className="row block px-2 py-1 text-[11px] leading-snug"
+                                            >
+                                              {item.title}
+                                            </Link>
+                                          </li>
+                                        );
+                                      })}
+                                    </ul>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </nav>
     </>

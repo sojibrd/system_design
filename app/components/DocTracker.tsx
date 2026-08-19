@@ -92,28 +92,30 @@ export default function DocTracker({ route }: { route: string; title?: string })
       {notesOpen && (
         <div className="mt-5 flex flex-col gap-4 seam-t pt-5">
           <div>
-            <label className="t-label mb-1.5 block">
+            <label htmlFor="doc-summary-input" className="t-label mb-1.5 block">
               মূল শিক্ষণীয় বিষয় (Key Takeaways)
             </label>
             <textarea
+              id="doc-summary-input"
               rows={3}
               value={currentNote.summary || ""}
               onChange={(e) => updateNoteField("summary", e.target.value)}
               placeholder="এই ডক থেকে শেখা প্রধান ৩-৪টি পয়েন্ট সংক্ষেপে লিখুন..."
-              className="surface-well t-body w-full px-3.5 py-2.5 text-xs focus:outline-none"
+              className="surface-well t-body w-full px-3.5 py-2.5 text-xs"
             />
           </div>
 
           <div>
-            <label className="t-label mb-1.5 block">
+            <label htmlFor="doc-unclear-input" className="t-label mb-1.5 block">
               অস্পষ্ট বিষয় বা ইন্টারভিউ পয়েন্ট (Doubts / Follow-ups)
             </label>
             <textarea
+              id="doc-unclear-input"
               rows={2}
               value={currentNote.unclear || ""}
               onChange={(e) => updateNoteField("unclear", e.target.value)}
               placeholder="যে বিষয়গুলো পরবর্তীতে আরো গবেষণা করা দরকার..."
-              className="surface-well t-body w-full px-3.5 py-2.5 text-xs focus:outline-none"
+              className="surface-well t-body w-full px-3.5 py-2.5 text-xs"
             />
           </div>
         </div>

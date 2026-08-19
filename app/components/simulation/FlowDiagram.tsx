@@ -12,7 +12,7 @@ import {
 } from "@xyflow/react";
 import { SimulationNode } from "./SimulationNode";
 import { AnimatedFlowEdge } from "./AnimatedEdge";
-import { CustomNodeType, CustomEdgeType } from "@/app/lib/types";
+import type { CustomNodeType, CustomEdgeType } from "@/app/lib/types";
 import { Lamp } from "@/app/components/ui";
 import { useThemeNumber } from "@/app/hooks/useThemeNumber";
 

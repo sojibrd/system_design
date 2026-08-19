@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Cpu } from "lucide-react";
-import { SimulationSummary } from "@/app/lib/types";
+import type { SimulationSummary } from "@/app/lib/types";
 import { SimulationPicker } from "./SimulationPicker";
 
 export const Header: React.FC<{

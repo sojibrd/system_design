@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import { LevelId, LevelConfig } from "@/app/lib/types";
+import type { LevelId, LevelConfig } from "@/app/lib/types";
 import { Layers } from "lucide-react";
 
 /**
@@ -54,7 +54,7 @@ export const LevelTabs: React.FC<{
     <div
       ref={listRef}
       role="tablist"
-      aria-label="Architecture level"
+      aria-label="আর্কিটেকচার লেভেল"
       onKeyDown={onKeyDown}
       /* A simulation declares only the levels that teach it something — two
          is valid, four (once a `global` tier exists) is valid. A row of equal
@@ -88,8 +88,8 @@ export const LevelTabs: React.FC<{
             </span>
             <span
               className="t-label hidden md:flex items-center gap-1"
-              title={`${level.componentCount} components`}
-              aria-label={`${level.componentCount} components`}
+              title={`${level.componentCount}টি কম্পোনেন্ট`}
+              aria-label={`${level.componentCount}টি কম্পোনেন্ট`}
             >
               <Layers className="w-3 h-3" />
               {level.componentCount}

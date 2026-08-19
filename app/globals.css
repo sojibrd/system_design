@@ -73,6 +73,13 @@ body {
     box-shadow: var(--t-well-shadow);
   }
 
+  .surface-well:focus-visible,
+  .surface-well:focus-within {
+    outline: 2px solid var(--t-accent);
+    outline-offset: 1px;
+    border-color: var(--t-accent);
+  }
+
   /* --- Text roles ------------------------------------------------------ */
 
   .t-title {

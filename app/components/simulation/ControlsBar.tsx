@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { FlowKind, FlowDefinition, FlowIcon } from "@/app/lib/types";
-import { SpeedOption } from "@/app/hooks/useSimulation";
+import type { FlowKind, FlowDefinition, FlowIcon } from "@/app/lib/types";
+import type { SpeedOption } from "@/app/hooks/useSimulation";
 import {
   Play,
   Pause,
@@ -114,12 +114,12 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
         title={
           hasNotes
             ? notesOpen
-              ? "Hide design notes"
-              : "Show design notes"
+              ? "ডিজাইন নোট লুকান"
+              : "ডিজাইন নোট দেখুন"
             : "এই লেভেলে কোনো নোট নেই"
         }
         aria-pressed={notesOpen}
-        aria-label="Toggle design notes panel"
+        aria-label={notesOpen ? "ডিজাইন নোট বন্ধ করুন" : "ডিজাইন নোট খুলুন"}
       >
         <Calculator className="w-4 h-4" />
         <span className="hidden sm:inline">Notes</span>
@@ -129,9 +129,9 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
         variant={stepsOpen ? "primary" : "outline"}
         onClick={() => onTogglePanel("steps")}
         className="px-3! py-2! text-xs! shrink-0 min-h-11 sm:min-h-0"
-        title={stepsOpen ? "Hide steps panel (full-width diagram)" : "Show steps panel"}
+        title={stepsOpen ? "ধাপের তালিকা লুকান" : "ধাপের তালিকা দেখুন"}
         aria-pressed={stepsOpen}
-        aria-label="Toggle step walkthrough panel"
+        aria-label={stepsOpen ? "ধাপের তালিকা বন্ধ করুন" : "ধাপের তালিকা খুলুন"}
       >
         {stepsOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRight className="w-4 h-4" />}
         <span className="hidden sm:inline">Steps</span>
@@ -149,7 +149,7 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
     <div
       className="flex items-end justify-center gap-1 flex-nowrap overflow-x-auto"
       role="group"
-      aria-label={`Step ${currentStepIndex + 1} of ${totalSteps}`}
+      aria-label={`ধাপ ${currentStepIndex + 1} / ${totalSteps}`}
     >
       {Array.from({ length: totalSteps }, (_, idx) => (
         <button
@@ -161,8 +161,8 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           }
           data-live={!isFinished}
           className="progress-mark shrink-0"
-          title={`Go to Step ${idx + 1}`}
-          aria-label={`Go to step ${idx + 1}`}
+          title={`${idx + 1} নম্বর ধাপে যান`}
+          aria-label={`${idx + 1} নম্বর ধাপে যান`}
         />
       ))}
     </div>
@@ -209,8 +209,8 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           <IconButton
             variant="ghost"
             onClick={onReset}
-            title="Reset"
-            aria-label="Reset simulation"
+            title="পুনরায় শুরু"
+            aria-label="সিমুলেশন পুনরায় শুরু করুন"
             className="hidden sm:inline-flex"
           >
             <RotateCcw className="w-4 h-4" />
@@ -219,8 +219,8 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           <IconButton
             onClick={onPrev}
             disabled={currentStepIndex < 0}
-            title="Previous step"
-            aria-label="Previous step"
+            title="পূর্ববর্তী ধাপ"
+            aria-label="পূর্ববর্তী ধাপ"
             className="min-w-11 min-h-11 sm:min-w-0 sm:min-h-0"
           >
             <SkipBack className="w-4 h-4" />
@@ -230,7 +230,7 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
             <Button
               variant="alert"
               onClick={onPause}
-              aria-label="Pause simulation"
+              aria-label="সিমুলেশন থামান"
               className="min-w-11 min-h-11 px-3! sm:px-4! sm:min-w-0 sm:min-h-0"
             >
               <Pause className="w-4 h-4 fill-current" />
@@ -241,7 +241,7 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
             <Button
               variant="primary"
               onClick={onPlay}
-              aria-label="Simulate flow"
+              aria-label="সিমুলেশন চালান"
               className="min-w-11 min-h-11 px-3! sm:px-4! sm:min-w-0 sm:min-h-0"
             >
               <Play className="w-4 h-4 fill-current" />
@@ -252,8 +252,8 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           <IconButton
             onClick={onNext}
             disabled={totalSteps === 0}
-            title="Next step"
-            aria-label="Next step"
+            title="পরবর্তী ধাপ"
+            aria-label="পরবর্তী ধাপ"
             className="min-w-11 min-h-11 sm:min-w-0 sm:min-h-0"
           >
             <SkipForward className="w-4 h-4" />
@@ -265,8 +265,8 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           <IconButton
             onClick={() => setIsSetupOpen((open) => !open)}
             aria-expanded={isSetupOpen}
-            aria-label="Flow, speed and reset options"
-            title="Flow, speed & reset"
+            aria-label="ফ্লো, গতি ও রিসেট অপশন"
+            title="ফ্লো, গতি ও রিসেট"
             className="sm:hidden min-w-11 min-h-11"
           >
             <MoreHorizontal className="w-4 h-4" />
@@ -300,8 +300,8 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           <IconButton
             variant="ghost"
             onClick={onReset}
-            title="Reset"
-            aria-label="Reset simulation"
+            title="পুনরায় শুরু"
+            aria-label="সিমুলেশন পুনরায় শুরু করুন"
             className="min-w-11 min-h-11 sm:hidden"
           >
             <RotateCcw className="w-4 h-4" />

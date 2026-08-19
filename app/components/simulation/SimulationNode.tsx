@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Handle, Position, NodeProps, useStore } from "@xyflow/react";
-import { SimulationNodeData, ComponentCategory } from "@/app/lib/types";
+import type { SimulationNodeData, ComponentCategory } from "@/app/lib/types";
 import {
   Info,
   Monitor,
@@ -187,7 +187,7 @@ export const SimulationNode: React.FC<NodeProps> = ({ data, selected }) => {
             className="control control--quiet p-1 shrink-0"
             aria-expanded={showTooltip}
             aria-controls={showTooltip ? cardId : undefined}
-            aria-label="Component info"
+            aria-label="কম্পোনেন্টের বিস্তারিত তথ্য"
           >
             <Info className="w-5 h-5" />
           </button>
@@ -212,7 +212,7 @@ export const SimulationNode: React.FC<NodeProps> = ({ data, selected }) => {
           /* A named region, so a screen reader announces what the info button
              just opened instead of leaving it as loose text on the canvas. */
           role="group"
-          aria-label={`${nodeData.label} — details`}
+          aria-label={`${nodeData.label} — বিস্তারিত`}
           className={`surface-raised absolute z-50 left-1/2 -translate-x-1/2 w-64 p-3 text-left pointer-events-none ${
             openUpwards ? "bottom-full mb-2" : "top-full mt-2"
           }`}

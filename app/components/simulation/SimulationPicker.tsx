@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { SimulationSummary } from "@/app/lib/types";
+import type { SimulationSummary } from "@/app/lib/types";
 import { Check, ChevronDown, Cpu } from "lucide-react";
 
 /**
@@ -60,6 +60,7 @@ export const SimulationPicker: React.FC<{
         onClick={() => setIsOpen((open) => !open)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
+        aria-label="সিমুলেশন নির্বাচন করুন"
         className="chip flex items-center gap-2 px-2.5 py-1 text-xs"
       >
         <Cpu className="w-3.5 h-3.5 t-accent" />

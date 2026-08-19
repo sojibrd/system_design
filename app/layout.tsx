@@ -77,8 +77,16 @@ export default function RootLayout({
       {/* `h-dvh` + `overflow-hidden`: the sidebar and the main column scroll
           independently, and the simulator needs a bounded height to fill. */}
       <body className="surface-app h-dvh overflow-hidden flex flex-col md:flex-row">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 control control--primary px-3 py-1.5 text-xs shadow-lg"
+        >
+          মূল কনটেন্টে যান
+        </a>
         <Sidebar nav={nav} />
-        <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
+        <main id="main-content" className="min-w-0 flex-1 overflow-y-auto">
+          {children}
+        </main>
       </body>
     </html>
   );

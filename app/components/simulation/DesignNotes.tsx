@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { LevelConfig } from "@/app/lib/types";
+import type { LevelConfig } from "@/app/lib/types";
 import {
   Calculator,
   GitCompare,
@@ -55,7 +55,7 @@ export const DesignNotes: React.FC<{
           <IconButton
             variant="ghost"
             onClick={onClose}
-            aria-label="Close design notes"
+            aria-label="ডিজাইন নোট বন্ধ করুন"
             className="lg:hidden"
           >
             <X className="w-4 h-4" />

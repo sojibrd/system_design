@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Activity,
   ChevronDown,
@@ -96,26 +96,47 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
       .filter((part) => part.chapters.length > 0);
   }, [nav.workbook.parts, query, isSearching]);
 
+  // Close on Escape key on mobile
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileOpen]);
+
   const simulationActive = pathname === "/simulation" || pathname.startsWith("/simulation/");
 
   return (
     <>
       {/* Mobile top bar */}
-      <div className="md:hidden shrink-0 surface-panel seam-b-heavy flex items-center justify-between px-4 py-2.5">
+      <div className="md:hidden shrink-0 surface-panel seam-b-heavy flex items-center justify-between px-4 py-2.5 z-30">
         <Link href="/" className="t-title text-sm">
           System Design
         </Link>
         <button
           type="button"
           onClick={() => setMobileOpen((v) => !v)}
-          className="control px-3 py-1.5 text-xs"
+          className="control px-3 py-1.5 text-xs min-h-10"
           aria-expanded={mobileOpen}
           aria-controls="site-sidebar"
         >
           {mobileOpen ? <X size={14} /> : <Menu size={14} />}
-          {mobileOpen ? "বন্ধ" : "সূচিপত্র"}
+          {mobileOpen ? "Close" : "Outline"}
         </button>
       </div>
+
+      {/* Mobile Drawer Backdrop */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/65 backdrop-blur-xs"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
       {/* Collapsed rail — the only way back to the rack on a wide screen */}
       {collapsed && (
@@ -132,12 +153,16 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
         </div>
       )}
 
-      {/* The index rack */}
+      {/* The index rack — fixed slide-over drawer on phone, static column on desktop */}
       <nav
         id="site-sidebar"
-        className={`${mobileOpen ? "flex" : "hidden"} ${
+        className={`${
+          mobileOpen
+            ? "fixed inset-y-0 left-0 z-50 w-[85%] max-w-sm shadow-2xl flex"
+            : "hidden"
+        } ${
           collapsed ? "md:hidden" : "md:flex"
-        } shrink-0 min-h-0 flex-1 md:flex-none flex-col md:w-80 surface-panel overflow-y-auto`}
+        } shrink-0 min-h-0 md:static flex-col md:w-80 surface-panel overflow-y-auto`}
       >
         <div className="p-4 flex flex-col gap-4">
           {/* Brand */}
@@ -190,7 +215,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
               onChange={(e) => setSearch(e.target.value)}
               placeholder="টপিক বা অধ্যায় খুঁজুন..."
               aria-label="টপিক বা অধ্যায় খুঁজুন"
-              className="surface-well t-body w-full px-3 py-2 text-xs"
+              className="surface-well t-body w-full px-3 py-2 text-sm sm:text-xs"
             />
             {search && (
               <button
@@ -219,7 +244,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
                 onClick={() => setRoadmapOpen((v) => !v)}
                 aria-expanded={roadmapOpen}
                 aria-controls="roadmap-list"
-                className="t-label flex w-full items-center justify-between py-1"
+                className="t-label flex w-full items-center justify-between py-1.5 sm:py-1"
               >
                 <span>
                   {nav.roadmap.title} ({filteredRoadmap.length})
@@ -237,7 +262,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
                           href={item.route}
                           onClick={() => setMobileOpen(false)}
                           aria-current={active ? "true" : undefined}
-                          className="row block px-2.5 py-1.5 text-xs leading-snug"
+                          className="row block px-2.5 py-2 sm:py-1.5 text-xs leading-snug"
                         >
                           {item.title}
                         </Link>
@@ -257,7 +282,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
                 onClick={() => setWorkbookOpen((v) => !v)}
                 aria-expanded={workbookOpen}
                 aria-controls="workbook-tree"
-                className="t-label flex w-full items-center justify-between py-1"
+                className="t-label flex w-full items-center justify-between py-1.5 sm:py-1"
               >
                 <span>{nav.workbook.title}</span>
                 {workbookOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
@@ -276,7 +301,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
                           onClick={() => toggleOpen(part.key)}
                           aria-expanded={partOpen}
                           aria-controls={partContentId}
-                          className="row flex w-full items-center justify-between px-2 py-1 text-left text-xs"
+                          className="row flex w-full items-center justify-between px-2.5 py-2 sm:py-1 text-left text-xs"
                         >
                           <span className="truncate">{part.title}</span>
                           {partOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
@@ -296,7 +321,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
                                     onClick={() => toggleOpen(chKey)}
                                     aria-expanded={chOpen}
                                     aria-controls={chContentId}
-                                    className="row flex w-full items-center justify-between px-2 py-1 text-left text-[11px]"
+                                    className="row flex w-full items-center justify-between px-2.5 py-1.5 sm:py-1 text-left text-xs sm:text-[11px]"
                                   >
                                     <span className="truncate">{ch.title}</span>
                                     {chOpen ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
@@ -312,7 +337,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
                                               href={item.route}
                                               onClick={() => setMobileOpen(false)}
                                               aria-current={active ? "true" : undefined}
-                                              className="row block px-2 py-1 text-[11px] leading-snug"
+                                              className="row block px-2.5 py-2 sm:py-1 text-xs sm:text-[11px] leading-snug"
                                             >
                                               {item.title}
                                             </Link>

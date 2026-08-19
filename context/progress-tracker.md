@@ -75,13 +75,11 @@ _সর্বশেষ আপডেট: ২০২৬-০৭-৩০_
 - [x] প্রতিটা পার্ট ও চ্যাপ্টারের index ফাইল (বাংলা heading সহ)
 - [x] `AGENTS.md` — এজেন্ট নিয়মাবলী
 
-### Mobile Responsive Polish & Fullscreen Reading Modal (সম্পূর্ণ)
-- [x] `Navbar` — `text-lg sm:text-xl` + `truncate` — 320px স্ক্রিনে title overflow ঠেকানো
-- [x] `Sidebar drawer` — ভেতরে ✕ close button যোগ ("বিষয়সূচি" header)
-- [x] `ChapterButton` — `py-2.5 sm:py-2` — মোবাইলে touch target বাড়ানো
-- [x] `DocCard` — Inline expansion বদলে **Fullscreen Reading Modal** (পড়ুন 📖 বাটন দিয়ে খোলে)
-- [x] `ReadingModal` — Sticky top breadcrumb + full viewport reading area + collapsible notes section + bottom floating action bar (`☐ পড়া হয়েছে`, `🔄`, `📝 নোট`, `✕ বন্ধ`)
-- [x] `DocContent` — `p-3 sm:p-4` — ছোট স্ক্রিনে reading area সর্বোচ্চ ব্যবহার
+### Mobile Responsive Polish & UX Audit (সম্পূর্ণ)
+- [x] `Sidebar drawer` — মোবাইলে split লেআউট বদলে ফিক্সড স্লাইড-ওভার ড্রয়ার (`fixed inset-y-0 left-0 z-50 w-[85%] max-w-sm`) + ব্যাকড্রপ ওভারলে + `Escape` কি ও ক্লিক-আউটসাইড ডিসমিসাল
+- [x] `Sidebar search & links` — সার্চ ইনপুটে iOS Safari auto-zoom রোধে `text-sm sm:text-xs` এবং সূচিপত্রের সব আইটেমে টাচ টার্গেট বাড়ানো (`py-2 sm:py-1.5`)
+- [x] `DocTracker` — অ্যাকশন বাটনগুলোতে আরামদায়ক টাচ টার্গেট (`min-h-10 sm:min-h-0`) এবং টেক্সটএরিয়ায় রেসপনসিভ ফন্ট সাইজ
+- [x] `ProgressClient` — সেগমেন্ট গ্রুপে মসৃণ হরাইজন্টাল স্ক্রলিং (`flex-nowrap overflow-x-auto`), অ্যাকশন বাটনে `flex-wrap sm:flex-nowrap` ও মিনিমাম টাচ হাইট
 
 ### Context ফাইল
 - [x] `project-overview.md` — লক্ষ্য, স্ট্যাক, ডেটা কাঠামো, ডেটা মডেল

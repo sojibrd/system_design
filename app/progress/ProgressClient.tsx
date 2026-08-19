@@ -173,14 +173,14 @@ export default function ProgressClient({
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div className="segment-group flex-wrap">
+        <div className="segment-group max-w-full overflow-x-auto flex-nowrap shrink-0">
           {filters.map((f) => (
             <button
               key={f.id}
               type="button"
               onClick={() => setActiveFilter(f.id)}
               aria-pressed={activeFilter === f.id}
-              className="segment text-xs"
+              className="segment text-xs shrink-0 whitespace-nowrap min-h-10 sm:min-h-0"
             >
               {f.label} ({f.count})
             </button>
@@ -188,14 +188,14 @@ export default function ProgressClient({
         </div>
 
         <div className="flex items-center gap-2">
-          <label htmlFor="progress-section-filter" className="t-label">
+          <label htmlFor="progress-section-filter" className="t-label shrink-0">
             সেকশন
           </label>
           <select
             id="progress-section-filter"
             value={activeSection}
             onChange={(e) => setActiveSection(e.target.value)}
-            className="control px-3 py-1.5 text-xs"
+            className="control px-3 py-1.5 text-xs min-h-10 sm:min-h-0"
           >
             <option value="all">সব সেকশন</option>
             <option value="docs">Roadmap</option>
@@ -241,12 +241,14 @@ export default function ProgressClient({
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
                   <button
                     type="button"
                     onClick={() => toggleRead(doc.route)}
                     aria-pressed={isRead}
-                    className={`control px-2.5 py-1 text-xs ${isRead ? "control--primary" : ""}`}
+                    className={`control px-2.5 py-1.5 sm:py-1 text-xs min-h-9 sm:min-h-0 ${
+                      isRead ? "control--primary" : ""
+                    }`}
                   >
                     {isRead ? <Check size={12} /> : <Circle size={12} />}
                     {isRead ? "পঠিত" : "অপঠিত"}
@@ -256,13 +258,18 @@ export default function ProgressClient({
                     type="button"
                     onClick={() => toggleRevise(doc.route)}
                     aria-pressed={isRevise}
-                    className={`control px-2.5 py-1 text-xs ${isRevise ? "control--alert" : ""}`}
+                    className={`control px-2.5 py-1.5 sm:py-1 text-xs min-h-9 sm:min-h-0 ${
+                      isRevise ? "control--alert" : ""
+                    }`}
                   >
                     <RotateCcw size={12} />
                     {isRevise ? "রিভাইজ" : "রিভাইজ?"}
                   </button>
 
-                  <Link href={doc.route} className="control px-3 py-1 text-xs">
+                  <Link
+                    href={doc.route}
+                    className="control px-3 py-1.5 sm:py-1 text-xs min-h-9 sm:min-h-0"
+                  >
                     পড়ুন <ArrowRight size={12} />
                   </Link>
                 </div>

@@ -60,7 +60,9 @@ export default function DocTracker({ route }: { route: string; title?: string })
             type="button"
             onClick={toggleRead}
             aria-pressed={isRead}
-            className={`control px-3.5 py-2 text-xs ${isRead ? "control--primary" : ""}`}
+            className={`control px-3.5 py-2.5 sm:py-2 text-xs min-h-10 sm:min-h-0 ${
+              isRead ? "control--primary" : ""
+            }`}
           >
             {isRead ? <Check size={13} /> : <Circle size={13} />}
             {isRead ? "পঠিত" : "পড়া হয়নি"}
@@ -70,7 +72,9 @@ export default function DocTracker({ route }: { route: string; title?: string })
             type="button"
             onClick={toggleRevise}
             aria-pressed={isRevise}
-            className={`control px-3.5 py-2 text-xs ${isRevise ? "control--alert" : ""}`}
+            className={`control px-3.5 py-2.5 sm:py-2 text-xs min-h-10 sm:min-h-0 ${
+              isRevise ? "control--alert" : ""
+            }`}
           >
             <RotateCcw size={13} />
             {isRevise ? "রিভাইজ তালিকাভুক্ত" : "রিভাইজ দরকার"}
@@ -80,7 +84,7 @@ export default function DocTracker({ route }: { route: string; title?: string })
             type="button"
             onClick={() => setNotesOpen((prev) => !prev)}
             aria-expanded={notesOpen}
-            className="control px-3.5 py-2 text-xs"
+            className="control px-3.5 py-2.5 sm:py-2 text-xs min-h-10 sm:min-h-0"
           >
             <NotebookPen size={13} />
             {hasNote ? "নোট সংরক্ষিত" : "নোট যুক্ত করুন"}
@@ -101,7 +105,7 @@ export default function DocTracker({ route }: { route: string; title?: string })
               value={currentNote.summary || ""}
               onChange={(e) => updateNoteField("summary", e.target.value)}
               placeholder="এই ডক থেকে শেখা প্রধান ৩-৪টি পয়েন্ট সংক্ষেপে লিখুন..."
-              className="surface-well t-body w-full px-3.5 py-2.5 text-xs"
+              className="surface-well t-body w-full px-3.5 py-2.5 text-sm sm:text-xs"
             />
           </div>
 
@@ -115,7 +119,7 @@ export default function DocTracker({ route }: { route: string; title?: string })
               value={currentNote.unclear || ""}
               onChange={(e) => updateNoteField("unclear", e.target.value)}
               placeholder="যে বিষয়গুলো পরবর্তীতে আরো গবেষণা করা দরকার..."
-              className="surface-well t-body w-full px-3.5 py-2.5 text-xs"
+              className="surface-well t-body w-full px-3.5 py-2.5 text-sm sm:text-xs"
             />
           </div>
         </div>

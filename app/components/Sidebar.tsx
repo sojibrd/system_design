@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   Activity,
   ChevronDown,
@@ -96,6 +96,8 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
       .filter((part) => part.chapters.length > 0);
   }, [nav.workbook.parts, query, isSearching]);
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   // Close on Escape key on mobile
   useEffect(() => {
     if (!mobileOpen) return;
@@ -107,6 +109,32 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [mobileOpen]);
+
+  // Desktop keyboard shortcuts: `/` or `Ctrl+K` / `Cmd+K` focuses search
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isInput =
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable);
+
+      if (
+        (e.key === "/" && !isInput) ||
+        ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k")
+      ) {
+        e.preventDefault();
+        if (collapsed) setCollapsed(false);
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [collapsed, setCollapsed]);
 
   const simulationActive = pathname === "/simulation" || pathname.startsWith("/simulation/");
 
@@ -125,7 +153,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
           aria-controls="site-sidebar"
         >
           {mobileOpen ? <X size={14} /> : <Menu size={14} />}
-          {mobileOpen ? "Close" : "Outline"}
+          {mobileOpen ? "বন্ধ" : "সূচিপত্র"}
         </button>
       </div>
 
@@ -209,23 +237,43 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
           {/* Quick search */}
           <div className="relative">
             <input
+              ref={searchInputRef}
               id="sidebar-search"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  if (search) {
+                    setSearch("");
+                  } else {
+                    searchInputRef.current?.blur();
+                  }
+                }
+              }}
               placeholder="টপিক বা অধ্যায় খুঁজুন..."
-              aria-label="টপিক বা অধ্যায় খুঁজুন"
-              className="surface-well t-body w-full px-3 py-2 text-sm sm:text-xs"
+              aria-label="টপিক বা অধ্যায় খুঁজুন (শর্টকাট: / বা Ctrl+K)"
+              className="surface-well t-body w-full pl-3 pr-8 py-2 text-sm sm:text-xs"
             />
-            {search && (
+            {search ? (
               <button
                 type="button"
-                onClick={() => setSearch("")}
+                onClick={() => {
+                  setSearch("");
+                  searchInputRef.current?.focus();
+                }}
                 className="control control--quiet absolute right-1.5 top-1.5 px-1.5 py-1"
                 aria-label="খোঁজা বাতিল"
               >
                 <X size={12} />
               </button>
+            ) : (
+              <span
+                className="hidden md:inline-flex absolute right-2.5 top-2.5 t-caption t-mono opacity-50 pointer-events-none select-none text-[11px]"
+                title="শর্টকাট: / অথবা Ctrl+K"
+              >
+                /
+              </span>
             )}
           </div>
 

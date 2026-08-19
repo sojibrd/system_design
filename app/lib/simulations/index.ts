@@ -19,6 +19,11 @@ export const simulationIndex: SimulationSummary[] = [
     name: "URL Shortener",
     tagline: "একটা লম্বা লিংককে ছোট কোডে বদলে, ক্লিক পড়লে আবার ফিরিয়ে দেওয়া",
   },
+  {
+    id: "rate-limiter",
+    name: "Rate Limiter",
+    tagline: "কে কতবার ডাকতে পারবে তার হিসাব রেখে ভেতরের সার্ভিসকে বাঁচানো",
+  },
 ];
 
 export const defaultSimulationId = simulationIndex[0].id;
@@ -30,6 +35,8 @@ export const defaultSimulationId = simulationIndex[0].id;
 const loaders: Record<string, () => Promise<SimulationConfig>> = {
   "url-shortener": () =>
     import("./url-shortener").then((m) => m.urlShortenerSimulation),
+  "rate-limiter": () =>
+    import("./rate-limiter").then((m) => m.rateLimiterSimulation),
 };
 
 export const isSimulationId = (id: string): boolean => id in loaders;

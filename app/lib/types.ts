@@ -61,10 +61,22 @@ export type FlowKind =
   | "redirect"
   | "redirect-miss"
   | "failover"
-  | "analytics";
+  | "analytics"
+  // Rate limiter: the two answers a limiter can give, and what it does when
+  // the thing holding the count is unreachable.
+  | "allowed"
+  | "throttled"
+  | "limiter-down";
 
 /** Name of a lucide icon the controls bar renders for a flow. */
-export type FlowIcon = "link" | "redirect" | "miss" | "failover" | "analytics";
+export type FlowIcon =
+  | "link"
+  | "redirect"
+  | "miss"
+  | "failover"
+  | "analytics"
+  | "allow"
+  | "block";
 
 export interface FlowDefinition {
   id: FlowKind;

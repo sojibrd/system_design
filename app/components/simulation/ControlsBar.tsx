@@ -17,6 +17,8 @@ import {
   SearchX,
   ShieldAlert,
   BarChart3,
+  CircleCheck,
+  Ban,
   MoreHorizontal,
   type LucideIcon,
   PanelRightClose,
@@ -30,6 +32,8 @@ const flowIcons: Record<FlowIcon, LucideIcon> = {
   miss: SearchX,
   failover: ShieldAlert,
   analytics: BarChart3,
+  allow: CircleCheck,
+  block: Ban,
 };
 
 /** The side slot holds the walkthrough or the design notes — never both. */

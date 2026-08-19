@@ -183,3 +183,14 @@ _কিছু নেই — ফেজ ০ ও ফেজ ১ সম্পূর�
 - [x] `SimulationSummary` টাইপ + `simulationIndex` / `loadSimulation` — picker নাম পায়, রুট শুধু নিজের ডেটা লোড করে (per-sim chunk)
 - [x] মোবাইলে সিমুলেটরের ident লুকানো; picker থাকে
 - [x] build ৬৬ রুট, lint clean
+
+### দ্বিতীয় সিমুলেশন — Rate Limiter (২০২৬-০৮-২০)
+
+- [x] `app/lib/simulations/rate-limiter/` — ৩ লেভেল, ২৭ ধাপ, ৭টি trade-off সেট
+  - functional: fixed window, in-memory counter, 429 + Retry-After (৩ node)
+  - scalable: LB + ৩ সার্ভার + Redis, atomic INCR/Lua, sliding window counter (৭ node)
+  - reliable: token bucket lease, Redis replica + Sentinel, fail-open নীতি, hot key sharding (৮ node)
+- [x] নতুন flow: `allowed`, `throttled`, `limiter-down` — `FlowKind`/`FlowIcon` union, `flowIcons`, `flowBadge` map-এ যোগ
+- [x] রেজিস্ট্রিতে দুই লাইন — রুট `/simulation/rate-limiter/` নিজে থেকেই তৈরি, picker স্বয়ংক্রিয়ভাবে dropdown হয়ে গেছে
+- [x] `scripts/check-simulations.mjs` + `npm run check:simulations` — step-এর node/edge রেফারেন্স, flowType মিল ও `componentCount` যাচাই করে (এটাই `componentCount` ভুল ধরেছিল)
+- [x] ডেটা ফাইলগুলো `import type`-এ — Node-এর type stripping দিয়ে স্ক্রিপ্ট চালানোর জন্য দরকারি, এবং এটাই সঠিক রূপ

@@ -1,4 +1,4 @@
-import { SimulationConfig } from "../../types";
+import type { SimulationConfig } from "../../types";
 import { functionalLevel } from "./functional";
 import { scalableLevel } from "./scalable";
 import { reliableLevel } from "./reliable";

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check:diagrams": "node scripts/check-diagrams.mjs"
+    "check:diagrams": "node scripts/check-diagrams.mjs",
+    "check:simulations": "node --experimental-strip-types --import ./scripts/register-ts-resolve.mjs scripts/check-simulations.mjs"
   },
   "dependencies": {
     "@xyflow/react": "^12.11.3",

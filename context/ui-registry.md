@@ -44,7 +44,7 @@
 | `app/hooks/useThemeNumber.ts` | থিম থেকে সংখ্যা পড়ে (SVG geometry, grid gap) | Custom Hook |
 | `app/hooks/useMediaQuery.ts` | `usePrefersReducedMotion` — অ্যানিমেশন বন্ধ করার অনুরোধ মানে | Custom Hook |
 | `app/lib/simulations/index.ts` | `simulationIndex` (হালকা সারাংশ) + `loadSimulation` (per-sim dynamic import) | Registry |
-| `app/lib/simulations/<sim>/` | সিমুলেশন ডেটা (URL Shortener × ৩ লেভেল) — **রঙ নেই, শুধু অর্থ** | Data |
+| `app/lib/simulations/<sim>/` | সিমুলেশন ডেটা (URL Shortener, Rate Limiter — প্রতিটি ৩ লেভেল) — **রঙ নেই, শুধু অর্থ** | Data |
 | `app/lib/types.ts` | `SimulationConfig`, `LevelId`, `SignalKind` ইত্যাদি | Types |
 
 ---
@@ -79,6 +79,8 @@
 
 ১. `app/lib/simulations/<slug>/` — level ফাইল লিখুন, `<slug>/index.ts`-এ `SimulationConfig` এক্সপোর্ট করুন
 ২. `app/lib/simulations/index.ts`-এ দুটো লাইন — `simulationIndex`-এ সারাংশ, `loaders`-এ dynamic import
+৩. নতুন flow হলে `FlowKind` / `FlowIcon` union-এ সদস্য, `ControlsBar`-এর `flowIcons` ও `WalkthroughPanel`-এর `flowBadge` map-এ এন্ট্রি
+৪. `npm run check:simulations` চালান — step-এর সব node/edge আইডি সত্যিই আছে কিনা যাচাই করে
 
 এর বেশি কিছু লাগে না: রুট (`/simulation/<slug>/`) `generateStaticParams` থেকে নিজেই তৈরি হয়, এবং `SimulationPicker` দুই বা তার বেশি এন্ট্রি দেখলে স্থির প্লেট থেকে dropdown-এ বদলে যায়।
 

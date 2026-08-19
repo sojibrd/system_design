@@ -1,4 +1,4 @@
-import { LevelConfig } from "../../types";
+import type { LevelConfig } from "../../types";
 
 export const reliableLevel: LevelConfig = {
   id: "reliable",

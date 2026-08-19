@@ -21,6 +21,9 @@ const flowBadge: Record<FlowKind, string> = {
   "redirect-miss": "REDIRECT · MISS",
   failover: "FAILOVER",
   analytics: "ANALYTICS",
+  allowed: "ALLOWED",
+  throttled: "THROTTLED · 429",
+  "limiter-down": "LIMITER DOWN",
 };
 
 interface WalkthroughPanelProps {

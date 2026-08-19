@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useMemo } from "react";
+import { Activity, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import type { NavTree } from "@/app/lib/content";
 
 function normalize(path: string): string {
@@ -75,89 +76,99 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
       .filter((part) => part.chapters.length > 0);
   }, [nav.workbook.parts, query, isSearching]);
 
+  const simulationActive = pathname === "/simulation";
+
   return (
     <>
-      {/* Mobile Top Bar */}
-      <div className="md:hidden sticky top-0 z-30 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-4 py-3">
-        <Link href="/" className="text-sm font-bold tracking-tight text-[var(--foreground)]">
+      {/* Mobile top bar */}
+      <div className="md:hidden shrink-0 surface-panel seam-b-heavy flex items-center justify-between px-4 py-2.5">
+        <Link href="/" className="t-title text-sm">
           System Design
         </Link>
         <button
           type="button"
           onClick={() => setMobileOpen((v) => !v)}
-          className="rounded-lg border border-[var(--border)] bg-[var(--surface-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)]"
+          className="control px-3 py-1.5 text-xs"
           aria-expanded={mobileOpen}
         >
-          {mobileOpen ? "✕ মেনু বন্ধ" : "☰ সূচিপত্র"}
+          {mobileOpen ? <X size={14} /> : <Menu size={14} />}
+          {mobileOpen ? "বন্ধ" : "সূচিপত্র"}
         </button>
       </div>
 
-      {/* Sidebar Container */}
+      {/* The index rack */}
       <nav
         className={`${
-          mobileOpen ? "block" : "hidden"
-        } md:block shrink-0 border-b md:border-b-0 md:border-r border-[var(--border)] bg-[var(--surface)] md:w-80 md:sticky md:top-0 md:h-screen md:overflow-y-auto z-20`}
+          mobileOpen ? "flex" : "hidden"
+        } md:flex shrink-0 min-h-0 flex-1 md:flex-none flex-col md:w-80 surface-panel overflow-y-auto`}
       >
-        <div className="p-5 flex flex-col gap-5">
-          {/* Brand Header */}
-          <div className="flex items-center justify-between">
-            <Link
-              href="/"
-              onClick={() => setMobileOpen(false)}
-              className="group block"
-            >
-              <div className="text-base font-bold tracking-tight text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
-                System Design
-              </div>
-              <p className="text-xs text-[var(--muted)]">রোডম্যাপ ও ল্যাবস গাইড</p>
+        <div className="p-4 flex flex-col gap-4">
+          {/* Brand */}
+          <div className="flex items-start justify-between gap-2">
+            <Link href="/" onClick={() => setMobileOpen(false)} className="block min-w-0">
+              <div className="t-title text-base">System Design</div>
+              <p className="t-label mt-1">রোডম্যাপ ও ল্যাবস গাইড</p>
             </Link>
 
             <Link
               href="/progress/"
               onClick={() => setMobileOpen(false)}
-              className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors ${
-                pathname === "/progress"
-                  ? "bg-[var(--accent)] text-white"
-                  : "bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)]"
+              className={`control px-2.5 py-1 text-[11px] ${
+                pathname === "/progress" ? "control--primary" : ""
               }`}
             >
-              📊 প্রোগ্রেস
+              প্রোগ্রেস
             </Link>
           </div>
 
-          {/* Quick Search */}
+          {/* The simulator — the one destination here that is not a document */}
+          <Link
+            href="/simulation/"
+            onClick={() => setMobileOpen(false)}
+            className={`control w-full justify-start px-3 py-2 text-xs ${
+              simulationActive ? "control--primary" : ""
+            }`}
+          >
+            <Activity size={14} />
+            সিমুলেশন
+          </Link>
+
+          {/* Quick search */}
           <div className="relative">
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="টপিক বা অধ্যায় খুঁজুন..."
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--background)] px-3 py-2 text-xs text-[var(--foreground)] placeholder-[var(--muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              className="surface-well t-body w-full px-3 py-2 text-xs focus:outline-none"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute right-2.5 top-2 text-xs text-[var(--muted)] hover:text-[var(--foreground)]"
+                className="control control--quiet absolute right-1.5 top-1.5 px-1.5 py-1"
+                aria-label="খোঁজা বাতিল"
               >
-                ✕
+                <X size={12} />
               </button>
             )}
           </div>
 
-          {/* Section 1: System Design Roadmap */}
-          <div className="space-y-1">
+          {/* Section 1 — Roadmap */}
+          <div className="flex flex-col gap-1">
             <button
               type="button"
               onClick={() => setRoadmapOpen((v) => !v)}
-              className="flex w-full items-center justify-between py-1 text-xs font-bold uppercase tracking-wider text-[var(--muted)] hover:text-[var(--foreground)]"
+              className="t-label flex w-full items-center justify-between py-1"
             >
-              <span>{nav.roadmap.title} ({filteredRoadmap.length})</span>
-              <span>{roadmapOpen ? "−" : "+"}</span>
+              <span>
+                {nav.roadmap.title} ({filteredRoadmap.length})
+              </span>
+              {roadmapOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
             </button>
 
             {roadmapOpen && (
-              <ul className="mt-1.5 space-y-0.5 border-l border-[var(--border)] pl-2">
+              <ul className="flex flex-col gap-0.5 pl-2">
                 {filteredRoadmap.map((item) => {
                   const active = normalize(item.route) === pathname;
                   return (
@@ -165,12 +176,8 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
                       <Link
                         href={item.route}
                         onClick={() => setMobileOpen(false)}
-                        aria-current={active ? "page" : undefined}
-                        className={`block rounded-lg px-2.5 py-1.5 text-xs leading-snug transition-colors ${
-                          active
-                            ? "bg-[var(--accent-soft)] font-semibold text-[var(--accent)]"
-                            : "text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)]"
-                        }`}
+                        aria-current={active ? "true" : undefined}
+                        className="row block px-2.5 py-1.5 text-xs leading-snug"
                       >
                         {item.title}
                       </Link>
@@ -181,53 +188,51 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
             )}
           </div>
 
-          {/* Section 2: System Design Workbook */}
-          <div className="space-y-2 pt-2 border-t border-[var(--border)]">
+          {/* Section 2 — Workbook */}
+          <div className="flex flex-col gap-2 pt-2 seam-t">
             <button
               type="button"
               onClick={() => setWorkbookOpen((v) => !v)}
-              className="flex w-full items-center justify-between py-1 text-xs font-bold uppercase tracking-wider text-[var(--muted)] hover:text-[var(--foreground)]"
+              className="t-label flex w-full items-center justify-between py-1"
             >
               <span>{nav.workbook.title}</span>
-              <span>{workbookOpen ? "−" : "+"}</span>
+              {workbookOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
             </button>
 
             {workbookOpen && (
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3">
                 {filteredWorkbookParts.map((part) => {
                   const partOpen = isSearching || openMap.has(part.key);
                   return (
-                    <div key={part.key} className="space-y-1">
+                    <div key={part.key} className="flex flex-col gap-1">
                       <button
                         type="button"
                         onClick={() => toggleOpen(part.key)}
-                        className="flex w-full items-center justify-between rounded-lg px-2 py-1 text-left text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--surface-hover)] transition-colors"
+                        className="row flex w-full items-center justify-between px-2 py-1 text-left text-xs"
                       >
                         <span className="truncate">{part.title}</span>
-                        <span className="text-[10px] text-[var(--muted)] ml-1">
-                          {partOpen ? "▼" : "▶"}
-                        </span>
+                        {partOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
                       </button>
 
                       {partOpen && (
-                        <div className="ml-2 space-y-2 border-l border-[var(--border)] pl-2">
+                        <div className="ml-2 flex flex-col gap-2 pl-2">
                           {part.chapters.map((ch) => {
                             const chKey = `${part.key}:${ch.key}`;
                             const chOpen = isSearching || openMap.has(chKey);
 
                             return (
-                              <div key={ch.key} className="space-y-1">
+                              <div key={ch.key} className="flex flex-col gap-1">
                                 <button
                                   type="button"
                                   onClick={() => toggleOpen(chKey)}
-                                  className="flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-[11px] font-medium text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--surface-hover)] transition-colors"
+                                  className="row flex w-full items-center justify-between px-2 py-1 text-left text-[11px]"
                                 >
                                   <span className="truncate">{ch.title}</span>
-                                  <span className="text-[9px] ml-1">{chOpen ? "▾" : "▸"}</span>
+                                  {chOpen ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
                                 </button>
 
                                 {chOpen && (
-                                  <ul className="ml-1 space-y-0.5 border-l border-[var(--border)]/70 pl-2">
+                                  <ul className="ml-1 flex flex-col gap-0.5 pl-2">
                                     {ch.items.map((item) => {
                                       const active = normalize(item.route) === pathname;
                                       return (
@@ -235,12 +240,8 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
                                           <Link
                                             href={item.route}
                                             onClick={() => setMobileOpen(false)}
-                                            aria-current={active ? "page" : undefined}
-                                            className={`block rounded-md px-2 py-1 text-[11px] leading-snug transition-colors ${
-                                              active
-                                                ? "bg-[var(--accent-soft)] font-semibold text-[var(--accent)]"
-                                                : "text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)]"
-                                            }`}
+                                            aria-current={active ? "true" : undefined}
+                                            className="row block px-2 py-1 text-[11px] leading-snug"
                                           >
                                             {item.title}
                                           </Link>

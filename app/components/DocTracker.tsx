@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check, ChevronDown, ChevronUp, Circle, NotebookPen, RotateCcw } from "lucide-react";
 import useLocalStorage from "@/app/hooks/useLocalStorage";
 
 export interface DocNote {
@@ -43,85 +44,76 @@ export default function DocTracker({ route }: { route: string; title?: string })
   }
 
   return (
-    <div className="mt-12 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-6 shadow-sm">
+    <div className="surface-panel mt-12 p-5 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-[var(--foreground)]">
-            অগ্রগতি ও ব্যক্তিগত স্টাডি ট্র্যাকার
-          </h3>
-          <p className="mt-0.5 text-xs text-[var(--muted)]">
+          <h3 className="t-title text-sm">অগ্রগতি ও ব্যক্তিগত স্টাডি ট্র্যাকার</h3>
+          <p className="t-caption mt-1">
             এই অধ্যায়ের অবস্থা পরিবর্তন ও নোট সংরক্ষণ করুন
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {/* The state a button reports is carried by `aria-pressed`; what
+              "on" looks like stays with the theme. */}
           <button
             type="button"
             onClick={toggleRead}
-            className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all ${
-              isRead
-                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
-                : "border border-[var(--border)] bg-[var(--surface-hover)] text-[var(--muted)] hover:text-[var(--foreground)]"
-            }`}
+            aria-pressed={isRead}
+            className={`control px-3.5 py-2 text-xs ${isRead ? "control--primary" : ""}`}
           >
-            <span>{isRead ? "✓" : "○"}</span>
-            <span>{isRead ? "পঠিত" : "পড়া হয়নি"}</span>
+            {isRead ? <Check size={13} /> : <Circle size={13} />}
+            {isRead ? "পঠিত" : "পড়া হয়নি"}
           </button>
 
           <button
             type="button"
             onClick={toggleRevise}
-            className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all ${
-              isRevise
-                ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30"
-                : "border border-[var(--border)] bg-[var(--surface-hover)] text-[var(--muted)] hover:text-[var(--foreground)]"
-            }`}
+            aria-pressed={isRevise}
+            className={`control px-3.5 py-2 text-xs ${isRevise ? "control--alert" : ""}`}
           >
-            <span>🔄</span>
-            <span>{isRevise ? "রিভাইজ তালিকাভুক্ত" : "রিভাইজ দরকার"}</span>
+            <RotateCcw size={13} />
+            {isRevise ? "রিভাইজ তালিকাভুক্ত" : "রিভাইজ দরকার"}
           </button>
 
           <button
             type="button"
             onClick={() => setNotesOpen((prev) => !prev)}
-            className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all ${
-              hasNote
-                ? "bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30"
-                : "border border-[var(--border)] bg-[var(--surface-hover)] text-[var(--muted)] hover:text-[var(--foreground)]"
-            }`}
+            aria-expanded={notesOpen}
+            className="control px-3.5 py-2 text-xs"
           >
-            <span>📝</span>
-            <span>{hasNote ? "নোট সংরক্ষিত" : "নোট যুক্ত করুন"}</span>
-            <span className="text-[10px] opacity-70">{notesOpen ? "▲" : "▼"}</span>
+            <NotebookPen size={13} />
+            {hasNote ? "নোট সংরক্ষিত" : "নোট যুক্ত করুন"}
+            {notesOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
           </button>
         </div>
       </div>
 
       {notesOpen && (
-        <div className="mt-5 space-y-4 border-t border-[var(--border)] pt-5 animate-in fade-in duration-200">
+        <div className="mt-5 flex flex-col gap-4 seam-t pt-5">
           <div>
-            <label className="block text-xs font-medium text-[var(--foreground)] mb-1.5">
-              📌 মূল শিক্ষণীয় বিষয় (Key Takeaways):
+            <label className="t-label mb-1.5 block">
+              মূল শিক্ষণীয় বিষয় (Key Takeaways)
             </label>
             <textarea
               rows={3}
               value={currentNote.summary || ""}
               onChange={(e) => updateNoteField("summary", e.target.value)}
               placeholder="এই ডক থেকে শেখা প্রধান ৩-৪টি পয়েন্ট সংক্ষেপে লিখুন..."
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--background)] px-3.5 py-2.5 text-xs text-[var(--foreground)] placeholder-[var(--muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              className="surface-well t-body w-full px-3.5 py-2.5 text-xs focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[var(--foreground)] mb-1.5">
-              ❓ অস্পষ্ট বিষয় বা ইন্টারভিউ পয়েন্ট (Doubts / Follow-ups):
+            <label className="t-label mb-1.5 block">
+              অস্পষ্ট বিষয় বা ইন্টারভিউ পয়েন্ট (Doubts / Follow-ups)
             </label>
             <textarea
               rows={2}
               value={currentNote.unclear || ""}
               onChange={(e) => updateNoteField("unclear", e.target.value)}
               placeholder="যে বিষয়গুলো পরবর্তীতে আরো গবেষণা করা দরকার..."
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--background)] px-3.5 py-2.5 text-xs text-[var(--foreground)] placeholder-[var(--muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              className="surface-well t-body w-full px-3.5 py-2.5 text-xs focus:outline-none"
             />
           </div>
         </div>

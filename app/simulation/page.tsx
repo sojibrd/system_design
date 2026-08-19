@@ -1,0 +1,184 @@
+"use client";
+
+import React, { useState } from "react";
+import { LevelId } from "@/app/lib/types";
+import { simulations, getSimulation } from "@/app/lib/simulations";
+import { useSimulation } from "@/app/hooks/useSimulation";
+import { Header } from "@/app/components/simulation/Header";
+import {
+  LevelTabs,
+  LEVEL_PANEL_ID,
+  levelTabId,
+} from "@/app/components/simulation/LevelTabs";
+import {
+  DesignNotes,
+  hasDesignNotes,
+} from "@/app/components/simulation/DesignNotes";
+import { FlowDiagram } from "@/app/components/simulation/FlowDiagram";
+import {
+  ControlsBar,
+  type PanelKind,
+} from "@/app/components/simulation/ControlsBar";
+import { WalkthroughPanel } from "@/app/components/simulation/WalkthroughPanel";
+import { Sheet } from "@/app/components/ui";
+
+export default function Home() {
+  const [currentSimulationId, setCurrentSimulationId] = useState<string>(
+    simulations[0].id
+  );
+  const [currentLevelId, setCurrentLevelId] = useState<LevelId>(
+    simulations[0].levels[0].id
+  );
+  /* The side slot holds ONE thing: the step walkthrough or the level's design
+     notes. Pressing the open panel's button closes it; pressing the other
+     swaps. */
+  const [activePanel, setActivePanel] = useState<PanelKind>(null);
+
+  const simulation = getSimulation(currentSimulationId);
+  // A simulation need not offer the level that was selected on the previous one
+  // — a per-city dispatch system has no global tier — so fall back to its first.
+  const currentLevel =
+    simulation.levels.find((level) => level.id === currentLevelId) ??
+    simulation.levels[0];
+
+  /* A level may have no notes to show — switching to one while its panel is
+     open would otherwise leave an empty sheet on screen. */
+  const levelHasNotes = hasDesignNotes(currentLevel);
+  const openPanel: PanelKind =
+    activePanel === "notes" && !levelHasNotes ? null : activePanel;
+
+  const togglePanel = (panel: Exclude<PanelKind, null>) =>
+    setActivePanel((open) => (open === panel ? null : panel));
+
+  const selectSimulation = (id: string) => {
+    setCurrentSimulationId(id);
+    setCurrentLevelId(getSimulation(id).levels[0].id);
+  };
+
+  const {
+    currentStepIndex,
+    isPlaying,
+    isFinished,
+    speed,
+    flowType,
+    availableFlows,
+    totalSteps,
+    currentStep,
+    currentSteps,
+    nodes,
+    edges,
+    play,
+    pause,
+    nextStep,
+    prevStep,
+    goToStep,
+    reset,
+    setSpeed,
+    setFlowType,
+  } = useSimulation(currentLevel);
+
+  return (
+    /* `h-full`, not `h-dvh`: the height this fills is what the site shell
+       leaves after the sidebar and the mobile top bar, not the viewport. */
+    <div className="h-full overflow-hidden flex flex-col">
+      {/* Top Navigation Header */}
+      <Header
+        simulations={simulations}
+        currentSimulationId={currentSimulationId}
+        onSelectSimulation={selectSimulation}
+      />
+
+      {/* Main Container — fills exactly what the header leaves behind */}
+      <main className="flex-1 min-h-0 w-full px-2 sm:px-3 md:px-5 lg:px-6 py-2 md:py-3 flex flex-col gap-2 md:gap-3">
+        {/* Level Selector Tabs */}
+        <div className="shrink-0">
+          <LevelTabs
+            currentLevelId={currentLevelId}
+            levels={simulation.levels}
+            onSelectLevel={(levelId) => setCurrentLevelId(levelId)}
+          />
+        </div>
+
+        {/* Simulation stage — takes every pixel the other rows do not need.
+            Opening a panel SPLITS this box rather than layering over it: rows
+            below `lg`, columns above. Nothing ever covers the canvas, because
+            watching the animation while reading the step is the whole app. */}
+        <div
+          className={`flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 ${
+            openPanel ? "grid-rows-[45%_minmax(0,1fr)] lg:grid-rows-1" : ""
+          }`}
+        >
+          {/* Architecture Canvas */}
+          <div
+            /* The canvas IS the panel the level tabs control — saying so is
+               what makes the tablist above a real widget rather than three
+               buttons wearing the role. */
+            id={LEVEL_PANEL_ID}
+            role="tabpanel"
+            aria-labelledby={levelTabId(currentLevel.id)}
+            className={`min-h-0 h-full overflow-hidden ${
+              openPanel ? "lg:col-span-7 xl:col-span-8" : "lg:col-span-12"
+            }`}
+          >
+            <FlowDiagram
+              key={`${simulation.id}-${currentLevelId}`}
+              nodes={nodes}
+              edges={edges}
+              fitViewSignal={openPanel !== null}
+            />
+          </div>
+
+          {/* Step-by-step walkthrough: a column on desktop, the stage's lower
+              row on a phone. */}
+          <Sheet
+            open={openPanel !== null}
+            onClose={() => setActivePanel(null)}
+            label={openPanel === "notes" ? "Design notes" : "Step walkthrough"}
+            className="min-h-0 lg:col-span-5 xl:col-span-4"
+          >
+            {openPanel === "notes" ? (
+              <DesignNotes
+                level={currentLevel}
+                onClose={() => setActivePanel(null)}
+              />
+            ) : (
+              <WalkthroughPanel
+                currentStep={currentStep}
+                currentStepIndex={currentStepIndex}
+                totalSteps={totalSteps}
+                steps={currentSteps}
+                onSelectStep={goToStep}
+                conceptSummary={currentLevel.conceptSummary}
+                onClose={() => setActivePanel(null)}
+              />
+            )}
+          </Sheet>
+        </div>
+
+        {/* Playback & Flow Controls — always full width, pinned to the bottom */}
+        <div className="shrink-0">
+          <ControlsBar
+            isPlaying={isPlaying}
+            speed={speed}
+            flowType={flowType}
+            availableFlows={availableFlows}
+            currentStepIndex={currentStepIndex}
+            totalSteps={totalSteps}
+            onPlay={play}
+            onPause={pause}
+            onNext={nextStep}
+            onPrev={prevStep}
+            onReset={reset}
+            onSpeedChange={setSpeed}
+            onFlowChange={setFlowType}
+            onSelectStep={goToStep}
+            isFinished={isFinished}
+            activePanel={openPanel}
+            onTogglePanel={togglePanel}
+            hasNotes={levelHasNotes}
+          />
+        </div>
+      </main>
+    </div>
+  );
+}

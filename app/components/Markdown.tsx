@@ -53,9 +53,15 @@ function extractMermaidSource(children: ReactNode): string | null {
   return typeof code === "string" ? code.trim() : null;
 }
 
+/**
+ * Long-form markdown carries no component to hang a role class on, so every
+ * visual decision for it lives in the `.doc-prose` block of the theme
+ * contract. Nothing here styles anything — it only routes links and swaps
+ * mermaid fences for a rendered diagram.
+ */
 export default function Markdown({ content, dir }: { content: string; dir: string }) {
   return (
-    <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-24 prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:leading-relaxed prose-li:leading-relaxed prose-pre:bg-zinc-950 prose-pre:border prose-pre:border-zinc-800 prose-pre:text-zinc-100 prose-table:block prose-table:overflow-x-auto">
+    <div className="doc-prose">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -63,23 +69,13 @@ export default function Markdown({ content, dir }: { content: string; dir: strin
             const resolved = resolveHref(href ?? "", dir);
             if (resolved.startsWith("/")) {
               return (
-                <Link
-                  href={resolved}
-                  className="font-medium text-[var(--accent)] underline underline-offset-4 hover:opacity-80 transition-opacity"
-                  {...props}
-                >
+                <Link href={resolved} {...props}>
                   {children}
                 </Link>
               );
             }
             return (
-              <a
-                href={resolved}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="font-medium text-[var(--accent)] underline underline-offset-4 hover:opacity-80 transition-opacity"
-                {...props}
-              >
+              <a href={resolved} target="_blank" rel="noreferrer noopener" {...props}>
                 {children}
               </a>
             );
@@ -90,31 +86,6 @@ export default function Markdown({ content, dir }: { content: string; dir: strin
               return <MermaidDiagram chart={mermaidSource} />;
             }
             return <pre {...props}>{children}</pre>;
-          },
-          code({ className, children, ...props }) {
-            const isBlock = Boolean(className);
-            if (isBlock) {
-              return (
-                <code className={`${className} font-mono text-sm leading-relaxed`} {...props}>
-                  {children}
-                </code>
-              );
-            }
-            return (
-              <code
-                className="font-mono text-[0.875em] bg-[var(--surface-hover)] border border-[var(--border)] px-1.5 py-0.5 rounded text-[var(--foreground)]"
-                {...props}
-              >
-                {children}
-              </code>
-            );
-          },
-          blockquote({ children }) {
-            return (
-              <blockquote className="my-4 border-l-4 border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-2 rounded-r-lg not-italic text-sm">
-                {children}
-              </blockquote>
-            );
           },
         }}
       >

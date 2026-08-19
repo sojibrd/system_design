@@ -1,181 +1,105 @@
-# UI Tokens — System Design Prep Tracker
+# Theme Contract — এক-ফাইল থিমিং
 
-এই ফাইলে প্রজেক্টের সম্পূর্ণ ডিজাইন টোকেন সিস্টেম আছে।
-সব রং, স্পেসিং, টাইপোগ্রাফি এখান থেকে নিন — কখনো hardcoded value ব্যবহার করবেন না।
+`system_design`-এর সব ভিজ্যুয়াল সিদ্ধান্ত CSS-এ থাকে, কম্পোনেন্টে নয়।
+রোডম্যাপ, ওয়ার্কবুক, প্রোগ্রেস ড্যাশবোর্ড ও সিমুলেটর — চারটিই একই কনট্র্যাক্ট মেনে চলে।
 
-> **স্ট্যাটাস: target spec.** app এখনো তৈরি হয়নি। `globals.css` লেখার সময় এই টোকেনগুলো হুবহু বসাতে হবে।
-> ভিত্তি: DSA Prep Tracker-এর টোকেন সিস্টেম (উত্তরাধিকার সূত্রে), যাতে দুই অ্যাপ একই রকম দেখায়।
+## থিম বদলানো
 
----
-
-## Color Tokens (CSS Custom Properties)
-
-`globals.css`-এ সংজ্ঞায়িত হবে। Light ও Dark উভয়ের জন্য আলাদা মান।
-
-### Light Mode (`:root`)
-
-| Token | Value | ব্যবহার |
-|-------|-------|--------|
-| `--background` | `#f5f7fb` | Page background |
-| `--foreground` | `#18181b` | Primary text |
-| `--card-bg` | `rgba(255,255,255,0.7)` | Glass card background |
-| `--card-border` | `rgba(228,228,231,0.6)` | Glass card border |
-| `--primary` | `#4f46e5` | Indigo — primary action, selected state |
-| `--primary-hover` | `#4338ca` | Primary hover state |
-| `--accent` | `#06b6d4` | Cyan — accent, gradient endpoint |
-| `--success` | `#10b981` | Emerald — পড়া হয়েছে state |
-| `--warning` | `#f59e0b` | Amber — রিভাইজ দরকার state |
-| `--shadow` | `0 4px 30px rgba(0,0,0,0.03)` | Card shadow |
-| `--glow` | `0 0 20px rgba(79,70,229,0.1)` | Indigo glow effect |
-
-### Dark Mode (`.dark`)
-
-| Token | Value | পরিবর্তন |
-|-------|-------|--------|
-| `--background` | `#09090b` | Zinc-950 |
-| `--foreground` | `#f4f4f5` | Zinc-100 |
-| `--card-bg` | `rgba(24,24,27,0.6)` | Dark glass |
-| `--card-border` | `rgba(39,39,42,0.8)` | Dark border |
-| `--primary` | `#6366f1` | Lighter indigo |
-| `--primary-hover` | `#4f46e5` | |
-| `--accent` | `#22d3ee` | Lighter cyan |
-| `--success` | `#34d399` | Lighter emerald |
-| `--warning` | `#fbbf24` | Lighter amber |
-| `--shadow` | `0 4px 30px rgba(0,0,0,0.3)` | Darker shadow |
-| `--glow` | `0 0 25px rgba(99,102,241,0.15)` | Stronger glow |
-
-> `--warning` টোকেনটা DSA Prep-এ ছিল না — এখানে "🔄 রিভাইজ দরকার" state-এর জন্য নতুন যোগ।
-
----
-
-## Tailwind Color Palette
-
-এই প্রজেক্টে Tailwind-এর zinc scale মূল palette।
-
-| Scale | Light Mode ব্যবহার | Dark Mode ব্যবহার |
-|-------|------------------|-----------------|
-| `zinc-50` | Page bg | — |
-| `zinc-100` | Subtle bg, badge bg | — |
-| `zinc-200` | Border, divider | — |
-| `zinc-400` | Muted text, icons | — |
-| `zinc-500` | Secondary text | — |
-| `zinc-600` | Body text | — |
-| `zinc-800` | — | Subtle bg |
-| `zinc-900` | Code block bg | Dark card bg |
-| `zinc-950` | — | Page bg |
-
-### Semantic Colors (Tailwind utility classes)
-
-| উদ্দেশ্য | Light | Dark |
-|---------|-------|------|
-| Primary / Selected chapter | `text-indigo-600`, `bg-indigo-500/10` | `text-indigo-400` |
-| Accent / Gradient end | `text-cyan-600` | `text-cyan-400` |
-| পড়া হয়েছে (read) | `text-emerald-600`, `bg-emerald-500/5` | `text-emerald-400` |
-| 🔄 রিভাইজ দরকার | `text-amber-600`, `bg-amber-500/10` | `text-amber-400` |
-| Info box ("কেন গুরুত্বপূর্ণ") | `text-cyan-600`, `bg-cyan-500/5` | `text-cyan-400` |
-| Source attribution | `text-zinc-400` | `text-zinc-500` |
-
----
-
-## Typography
-
-### Fonts
-
-| ভ্যারিয়েবল | ফন্ট | ব্যবহার |
-|-----------|------|--------|
-| `--font-geist-sans` | Geist Sans | সব body text (বাংলা ও ইংরেজি) |
-| `--font-geist-mono` | Geist Mono | Code blocks, inline code, doc ID |
-
-### Text Scale (Tailwind)
-
-| Class | Size | ব্যবহার |
-|-------|------|--------|
-| `text-[10px]` | 10px | Badge labels, doc ID, tiny counters |
-| `text-xs` | 12px | Meta info, source attribution, secondary labels |
-| `text-sm` | 14px | Body text, doc নাম, sidebar chapter নাম |
-| `text-base` | 16px | Doc কনটেন্ট (পড়ার জন্য মূল টেক্সট) |
-| `text-lg` | 18px | Section headings |
-| `text-xl` | 20px | Navbar title |
-| `text-2xl` | 24px | Chapter নাম (mobile) |
-| `text-3xl` | 30px | Chapter নাম (desktop) |
-
-> **নোট:** DSA Prep-এ মূল টেক্সট ছিল `text-sm` — এখানে ডক কনটেন্ট লম্বা প্যারাগ্রাফ, তাই পড়ার আরামের জন্য `text-base` ও `leading-relaxed`।
-
-### Font Weight
-
-| Class | ব্যবহার |
-|-------|--------|
-| `font-medium` | Labels |
-| `font-semibold` | Doc নাম, section titles |
-| `font-bold` | Headings, chapter নাম |
-| `font-extrabold` | Main chapter title |
-
----
-
-## Spacing & Layout
-
-| টোকেন | Value | ব্যবহার |
-|-------|-------|--------|
-| Sidebar width | `w-[360px]` (lg+) | Left navigation panel |
-| Max content width | `max-w-[1600px]` | Main container |
-| ~~Reading measure~~ | ~~`max-w-[72ch]`~~ | সরানো হয়েছে — Mermaid ডায়াগ্রামের জন্য খুব সরু ছিল; DocContent এখন full-width (দেখুন ui-rules §২) |
-| Page padding | `p-4 md:p-6 lg:p-8` | Responsive body padding |
-| Card padding (sm) | `p-4` | Doc card inner |
-| Card padding (md) | `p-5` | Dashboard cards |
-| Card padding (lg) | `p-6 md:p-8` | Main content panel |
-| Gap (sidebar items) | `gap-4`, `gap-5` | Part/chapter spacing |
-| Gap (docs) | `gap-3` | Doc card list |
-
----
-
-## Border Radius
-
-| Class | ব্যবহার |
-|-------|--------|
-| `rounded-lg` | Buttons, small cards |
-| `rounded-xl` | Input fields, info boxes |
-| `rounded-2xl` | Doc cards |
-| `rounded-3xl` | Main content panel |
-| `rounded-full` | Progress bar, pills, badges |
-
----
-
-## Gradients
-
-| ব্যবহার | Definition |
-|--------|-----------|
-| Logo title text | `bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent` |
-| Progress bar fill | `bg-gradient-to-r from-indigo-500 to-cyan-500` |
-
----
-
-## Special Effects
-
-### Glassmorphism (`.glass-panel`)
 ```css
-background: var(--card-bg);          /* semi-transparent */
-backdrop-filter: blur(12px);
-border: 1px solid var(--card-border);
-box-shadow: var(--shadow);
+/* app/globals.css — লাইন ৯ */
+@import "./themes/control-room.css";
 ```
 
-**ব্যবহার করুন:** Navbar, Sidebar, Main content panel, Mobile dashboard
+**এই একটা লাইনই** পুরো সাইটের চেহারা ঠিক করে। বর্তমান থিম: `control-room.css` (একমাত্র থিম)।
 
-### Glow Effect (`.glass-glow`)
-```css
-box-shadow: var(--shadow), var(--glow);
-```
-**ব্যবহার করুন:** Highlighted / focused cards
+**নতুন থিম লিখতে:** `app/themes/<name>.css`-এ একটা `:root {}` ব্লক, নিচের সব `--t-*` ভেরিয়েবল সেট করে। তারপর উপরের লাইনটা বদলান। **কম্পোনেন্টে কখনো হাত দেবেন না।**
+
+> সাইট **dark-only**। control-room-এ light mode নেই, `.dark` ক্লাস বা `prefers-color-scheme` toggle নেই। light চাইলে সেটা একটা নতুন থিম ফাইল, কোড পরিবর্তন নয়।
 
 ---
 
-## Transitions & Animations
+## অলঙ্ঘনীয় নিয়ম
 
-| উদ্দেশ্য | Class |
-|---------|-------|
-| Color/theme transition | `transition-colors duration-300` |
-| Progress bar fill | `transition-all duration-500` |
-| Hover scale | `hover:scale-105 transition-transform` |
-| Opacity fade | `opacity-0 group-hover:opacity-100 transition-opacity` |
-| Mobile drawer slide | `animate-slide-in-left` (custom keyframe) |
-| All properties | `transition-all` |
+1. **কম্পোনেন্টে কোনো ভিজ্যুয়াল সিদ্ধান্ত নয়।** রঙ তো নয়ই — `rounded-*`, `shadow-*`, `border-2`, `uppercase`, `tracking-*`, `font-bold` কোনোটাই না। এগুলো role class-এ থাকে।
+2. **Tailwind শুধু লেআউটের জন্য** — `flex`, `grid`, `gap`, `w-`, `min-h-`, `truncate`, `overflow-*`। চেহারার জন্য নয়।
+3. **কম্পোনেন্ট বলে *কী*, থিম বলে *কেমন*।** `data-active`, `aria-selected`, `aria-pressed`, `data-state` — অবস্থা জানায়; সেটা দেখতে কেমন হবে তা CSS ঠিক করে।
+4. **ডেটা ফাইলে রঙ নেই।** `lib/simulations/*` শুধু অর্থ বলে (`particleColor: "success"`)।
+5. **নতুন ভিজ্যুয়াল দরকার হলে আগে কনট্র্যাক্টে টোকেন যোগ করুন**, তারপর সব থিম ফাইলে ভ্যালু দিন।
+
+**একমাত্র ব্যতিক্রম — `.doc-prose`।** Markdown সরাসরি `<h2>`, `<td>`, `<blockquote>` হয়ে DOM-এ আসে; role class বসানোর মতো কম্পোনেন্ট নেই। তাই কনট্র্যাক্টের এই একটি ব্লক raw element স্টাইল করে — কিন্তু `.doc-prose`-এর ভেতরে scoped, আর সব মান `--t-doc-*` থেকে পড়ে।
+
+---
+
+## Role classes (`app/globals.css`)
+
+| শ্রেণি | ক্লাস |
+|---|---|
+| Surface | `surface-app` `surface-panel` `surface-raised` `surface-well` |
+| Text | `t-title` `t-label` `t-body` `t-caption` `t-mono` `t-strong` `t-accent` `t-muted` `t-ok` `t-quote` |
+| Seam | `seam` `seam-b` `seam-b-heavy` `seam-t` |
+| Control | `control` + `control--primary` `control--alert` `control--quiet`; `segment-group` / `segment` |
+| Chip | `chip` + `chip--accent` `chip--alert` `chip--ok` |
+| Callout | `callout` + `callout--accent` `callout--alert`; `option` |
+| Canvas | `unit` `backplane` `ornament-mark` `lamp` `terminal` `edge-tag` `wire` `packet-core` `packet-halo` |
+| Nav | `tab` `row` `progress-mark` `overlay` |
+| **Doc** | **`doc-prose`** — লম্বা Markdown কলাম (heading, table, code, quote, list) |
+| **Gauge** | **`gauge` / `gauge-fill`** (+ `data-tone="ok"`) — অনুপাত দেখানো বার |
+
+> `progress-mark` বনাম `gauge`: `progress-mark` বলে **কোথায়** (ধাপের ক্রমে অবস্থান), `gauge` বলে **কতটুকু** (অনুপাত)।
+
+### State attributes
+
+| অ্যাট্রিবিউট | কোথায় | অর্থ |
+|---|---|---|
+| `data-active` / `data-animated` | `.unit` | এই ধাপে সক্রিয় / চলমান |
+| `data-selected` | `.unit` | ইউজার সিলেক্ট করেছে |
+| `data-category` | `.unit` | ক্লায়েন্ট / কম্পিউট / স্টোরেজ … (spine-এর রং) |
+| `data-lit` / `data-blink` | `.lamp` | জ্বলছে / জ্বলে-নেভে |
+| `data-state` + `data-live` | `.progress-mark` | ধাপের অগ্রগতি |
+| `data-tone` | `.gauge-fill` | `ok` হলে সাফল্যের রঙে |
+| `aria-selected` | `.tab` | নির্বাচিত ফেজ |
+| `aria-pressed` | `.segment`, `.control` | নির্বাচিত / চালু অবস্থা |
+| `aria-current` | `.row` | বর্তমান লিস্ট আইটেম |
+| `data-corner` | `.ornament-mark` | কোন কোণা |
+
+---
+
+## থিম টোকেন (`--t-*`)
+
+নতুন থিম ফাইলে এগুলো সব সেট করতে হবে। রেফারেন্স: `app/themes/control-room.css`।
+
+- **Type:** `font-sans` `font-mono` `title-family|weight|tracking|transform` `label-family|size|weight|tracking|transform` `control-family|weight|tracking|transform` `quote-style`
+- **App:** `app-bg` `app-bg-image|size` `select-bg|fg` `overlay-bg|filter` `disabled-opacity` `hover-fill` `selected-bg|fg` `accent` `ok` `ok-soft`
+- **Text:** `text-title` `text-body` `text-label` `text-muted` `text-faint` `payload-fg`
+- **Surface:** `panel-*` `raised-*` `well-*` `seam` `seam-heavy`
+- **Control:** `control-*` `primary-*` `alert-*`
+- **Chip / Callout:** `chip-*` `callout-*`
+- **Canvas:** `unit-*` `unit-spine-*` `cat-*` `signal-*` `ornament-*` `lamp-*` `terminal-*` `wire-*` `packet-*` `edge-tag-bg` `canvas-*`
+- **Nav:** `tab-*` `progress-*` `scrollbar-*`
+- **Doc prose:** `doc-family` `doc-size` `doc-leading` `doc-flow` `doc-flow-tight` `doc-heading-lead` `doc-body` `doc-heading` `doc-strong` `doc-link` `doc-link-hover` `doc-marker` `doc-bullet` `doc-heading-family|weight|tracking|transform` `doc-h1|h2|h3|h4-size` `doc-code-fg|bg|border` `doc-pre-fg`
+- **Gauge:** `gauge-track` `gauge-border` `gauge-border-width` `gauge-radius` `gauge-fill` `gauge-fill-glow`
+- **Diagram (Mermaid):** `diagram-node-bg` `diagram-node-border` `diagram-line` `diagram-text`
+
+---
+
+## ফন্ট শেল্ফ (`app/layout.tsx`)
+
+পাঁচটি family একবারই লোড হয়; থিম ঠিক করে কোন role কোনটি পায়।
+
+| ভেরিয়েবল | ফন্ট | control-room-এ ভূমিকা |
+|---|---|---|
+| `--font-condensed` | Barlow Semi Condensed | `--t-font-sans` — title, label, control |
+| `--font-mono-family` | JetBrains Mono | `--t-font-mono` — readout, payload, কোড |
+| `--font-bengali` | Noto Sans Bengali | `--t-doc-family` — পড়ার কলাম; `--t-font-sans`-এর fallback |
+| `--font-grotesk` | Archivo | রিজার্ভ |
+| `--font-display` | Archivo Black | রিজার্ভ |
+
+> Latin ফেসগুলোতে বাংলা glyph নেই। `--t-font-sans`-এর স্ট্যাকে Noto Sans Bengali **দ্বিতীয়** — তাই latin লেবেল condensed চরিত্র রাখে, বাংলা নির্দিষ্টভাবে Noto-তে পড়ে, ব্রাউজারের এলোমেলো fallback-এ নয়।
+>
+> নতুন family যোগ করাই `layout.tsx` এডিট করার **একমাত্র** কারণ।
+
+---
+
+## Mermaid ডায়াগ্রাম
+
+Mermaid নিজের SVG আঁকে এবং প্যালেট JS মান হিসেবে নেয়, CSS হিসেবে নয়। তাই `MermaidDiagram.tsx` একমাত্র কম্পোনেন্ট যেটি `getComputedStyle` দিয়ে `--t-diagram-*` ও `--t-accent` পড়ে `themeVariables`-এ পাঠায়। মানগুলো তবুও থিমেরই — শুধু পড়াটা ওখানে হয়।

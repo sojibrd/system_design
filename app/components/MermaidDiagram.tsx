@@ -1,32 +1,29 @@
 "use client";
 
-import { useEffect, useId, useRef, useSyncExternalStore } from "react";
+import { useEffect, useId, useRef } from "react";
 
-function subscribeToTheme(onChange: () => void) {
-  if (typeof window === "undefined") return () => {};
-  const observer = new MutationObserver(onChange);
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ["class"],
-  });
-  return () => observer.disconnect();
-}
+/**
+ * Mermaid draws its own SVG and takes its palette as JS values, not CSS — so
+ * this is the one component that reads the theme back out of the document
+ * instead of leaving it to a role class. The values still belong to the theme
+ * (`--t-diagram-*`); only the reading happens here.
+ */
+function readThemeVars() {
+  const style = getComputedStyle(document.documentElement);
+  const read = (name: string, fallback: string) =>
+    style.getPropertyValue(name).trim() || fallback;
 
-function getIsDark() {
-  if (typeof window === "undefined") return false;
-  return document.documentElement.classList.contains("dark");
-}
-
-function getIsDarkOnServer() {
-  return false;
+  return {
+    nodeBg: read("--t-diagram-node-bg", "#2b251f"),
+    nodeBorder: read("--t-diagram-node-border", "#4d4238"),
+    line: read("--t-diagram-line", "#5f5245"),
+    text: read("--t-diagram-text", "#c9bda9"),
+    accent: read("--t-accent", "#ffb020"),
+    canvas: read("--t-well-bg", "#100e0b"),
+  };
 }
 
 export default function MermaidDiagram({ chart }: { chart: string }) {
-  const isDark = useSyncExternalStore(
-    subscribeToTheme,
-    getIsDark,
-    getIsDarkOnServer,
-  );
   const containerRef = useRef<HTMLDivElement>(null);
   const reactId = useId();
   const diagramId = `mermaid-${reactId.replace(/[^a-zA-Z0-9]/g, "")}`;
@@ -40,11 +37,40 @@ export default function MermaidDiagram({ chart }: { chart: string }) {
 
       try {
         const mermaid = (await import("mermaid")).default;
+        const t = readThemeVars();
+
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: "strict",
-          theme: isDark ? "dark" : "default",
-          fontFamily: "var(--font-geist-mono), monospace, system-ui, sans-serif",
+          theme: "base",
+          fontFamily: "var(--t-font-mono), monospace",
+          themeVariables: {
+            background: t.canvas,
+            primaryColor: t.nodeBg,
+            primaryBorderColor: t.nodeBorder,
+            primaryTextColor: t.text,
+            secondaryColor: t.nodeBg,
+            tertiaryColor: t.canvas,
+            lineColor: t.line,
+            textColor: t.text,
+            mainBkg: t.nodeBg,
+            nodeBorder: t.nodeBorder,
+            clusterBkg: t.canvas,
+            clusterBorder: t.nodeBorder,
+            titleColor: t.accent,
+            edgeLabelBackground: t.canvas,
+            actorBkg: t.nodeBg,
+            actorBorder: t.nodeBorder,
+            actorTextColor: t.text,
+            signalColor: t.line,
+            signalTextColor: t.text,
+              labelBoxBkgColor: t.nodeBg,
+            labelBoxBorderColor: t.nodeBorder,
+            labelTextColor: t.text,
+            noteBkgColor: t.canvas,
+            noteBorderColor: t.nodeBorder,
+            noteTextColor: t.text,
+          },
         });
 
         const { svg } = await mermaid.render(diagramId, chart);
@@ -72,15 +98,15 @@ export default function MermaidDiagram({ chart }: { chart: string }) {
     return () => {
       cancelled = true;
     };
-  }, [chart, isDark, diagramId]);
+  }, [chart, diagramId]);
 
   return (
-    <div className="my-6 overflow-x-auto rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-sm">
+    <div className="surface-well my-6 overflow-x-auto p-4">
       <div
         ref={containerRef}
         role="img"
         aria-label="সিস্টেম ডিজাইন ডায়াগ্রাম"
-        className="flex min-h-20 items-center justify-start text-sm text-[var(--muted)] [&_svg]:mx-auto"
+        className="t-caption flex min-h-20 items-center justify-start [&_svg]:mx-auto"
       >
         ডায়াগ্রাম লোড হচ্ছে…
       </div>

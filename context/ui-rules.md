@@ -40,99 +40,69 @@ Next 16-এ React Compiler চালু, তাই:
 
 ## ২. ডিজাইন নিয়ম (Design Rules)
 
-### রং ব্যবহার
-- `ui-tokens.md`-এর বাইরে **hardcoded hex/rgb ব্যবহার করবেন না**
-- CSS custom property বা Tailwind utility class ব্যবহার করুন
-- নতুন রং দরকার হলে প্রথমে `ui-tokens.md` আপডেট করুন
+সাইটের সব ভিজ্যুয়াল সিদ্ধান্ত **theme contract**-এ। পূর্ণ তালিকা `ui-tokens.md`-এ; এখানে শুধু নিয়ম।
 
-### Dark Mode
-- **সব** নতুন UI element-এ `dark:` variant দিতে হবে
-- Pattern: `bg-zinc-100 dark:bg-zinc-900`, `text-zinc-800 dark:text-zinc-200`
-- Dark mode class `.dark` root `<html>` element-এ toggle হয়
-- CSS custom property (`--card-bg` ইত্যাদি) স্বয়ংক্রিয়ভাবে switch করে
+### অলঙ্ঘনীয়
+- কম্পোনেন্টে **কোনো** ভিজ্যুয়াল ক্লাস নয় — রঙ, `rounded-*`, `shadow-*`, `border-*`, `uppercase`, `tracking-*`, `font-bold` কিছুই না
+- Tailwind **শুধু লেআউট** — `flex`, `grid`, `gap`, `w-`, `min-h-`, `truncate`, `overflow-*`
+- hardcoded hex/rgb কোথাও নয় — `--t-*` টোকেন ছাড়া রঙের কোনো উৎস নেই
+- নতুন ভিজ্যুয়াল দরকার হলে **আগে** কনট্র্যাক্টে role class + টোকেন, **তারপর** থিম ফাইলে মান
 
-### Glassmorphism
-- Card/panel তৈরিতে `.glass-panel` class ব্যবহার করুন (inline style নয়)
-- Navbar, sidebar, main panel — সব `glass-panel` ব্যবহার করবে
-- নতুন modal/dropdown-এও `glass-panel` ব্যবহার করুন
+### Dark mode
+সাইট **dark-only**। `dark:` variant, `.dark` ক্লাস বা theme toggle **নেই** — লিখবেন না। light চাইলে সেটা একটা নতুন থিম ফাইল।
 
-### Responsive Design
-- **Mobile first নয়, Desktop first** — কিন্তু responsive breakdown দিতে হবে
-- Tailwind breakpoints: `sm:`, `md:`, `lg:` ব্যবহার করুন
-- Sidebar: mobile-এ hamburger + slide-in drawer, desktop-এ `w-[360px] lg:shrink-0`
-- Font size: `text-2xl md:text-3xl` pattern অনুসরণ করুন
+### Long-form কনটেন্ট
+- Markdown-এর জন্য একমাত্র র‍্যাপার `.doc-prose` — `Markdown.tsx` কোনো element স্টাইল করে না
+- heading/table/code/quote-এর চেহারা `--t-doc-*` টোকেনে; বদলাতে হলে থিম ফাইল এডিট করুন, কম্পোনেন্ট নয়
+- পড়ার কলাম বাংলায় Noto Sans Bengali-তে, স্বাভাবিক case ও `1.85` leading — instrument chrome-এর uppercase/condensed ভাষা লেবেল ও কন্ট্রোলের জন্য, বডি টেক্সটের জন্য নয়
 
-### পড়ার আরাম (Reading Ergonomics)
-এই অ্যাপের মূল কাজ **লম্বা টেক্সট পড়া** — DSA Prep-এর মতো ছোট problem card নয়। তাই:
-- ~~Doc কনটেন্ট প্যারাগ্রাফে `max-w-[72ch]`~~ — সরানো হয়েছে। ডায়াগ্রাম (Mermaid) যোগ হওয়ার পর ৭২ch কলাম চওড়া ডায়াগ্রামের জন্য খুব সরু ছিল; ডেভেলপার সচেতনভাবে কনটেন্ট বক্স কার্ডের পুরো প্রস্থে নিতে বলেছেন। টেক্সটও এখন full-width — লম্বা লাইনের ট্রেড-অফ মেনে নেওয়া হয়েছে
-- `text-base leading-relaxed` — `text-sm` নয়
-- প্যারাগ্রাফের মাঝে `space-y-4`, heading-এর আগে বেশি gap
+### Responsive
+- Desktop first, তবে `sm:` `md:` `lg:` breakdown বাধ্যতামূলক
+- Sidebar: mobile-এ top bar + toggle, desktop-এ `md:w-80` স্থায়ী র‍্যাক
+- শেল `h-dvh overflow-hidden` — sidebar ও main আলাদা scroll করে; `/simulation/` তাই `h-full` নেয়
 
 ---
 
 ## ৩. কম্পোনেন্ট নিয়ম (Component Rules)
 
-### Card/Panel তৈরি
+### Card / Panel
 ```tsx
 // ✅ সঠিক
-<div className="glass-panel p-6 rounded-2xl">...</div>
+<div className="surface-panel p-6">...</div>
 
 // ❌ ভুল
-<div style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '16px' }}>...</div>
+<div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">...</div>
 ```
 
-### Status Badge
-
+### Status — অবস্থা attribute-এ, চেহারা থিমে
 ```tsx
-// ✅ পড়া হয়েছে
-<span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/10">
-  ✅ পড়া হয়েছে
-</span>
+// ✅ সঠিক
+<button aria-pressed={isRead} className={`control px-3 py-2 text-xs ${isRead ? "control--primary" : ""}`}>
+  {isRead ? <Check size={13} /> : <Circle size={13} />}
+  {isRead ? "পঠিত" : "পড়া হয়নি"}
+</button>
 
-// ✅ রিভাইজ দরকার
-<span className="text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/10">
-  🔄 রিভাইজ দরকার
-</span>
-
-// ✅ এখনো পড়া হয়নি
-<span className="text-[10px] font-bold bg-zinc-200 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">
-  ⚪ বাকি
-</span>
+// ❌ ভুল — কম্পোনেন্ট ঠিক করছে "on" দেখতে কেমন
+<button className={isRead ? "bg-emerald-500/15 text-emerald-400" : "bg-zinc-800"}>
 ```
 
-### Selected/Active state
+### লিস্ট আইটেম ও ট্যাব
 ```tsx
-// ✅ Active chapter button
-className={isSelected
-  ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-l-2 border-indigo-500'
-  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900'
-}
+<Link aria-current={active ? "true" : undefined} className="row block px-2.5 py-1.5 text-xs">…</Link>
+<button aria-selected={selected} className="tab px-3 py-2">…</button>
+<button aria-pressed={selected} className="segment text-xs">…</button>
 ```
 
-### Info/Highlight box
+### অনুপাত দেখানো
 ```tsx
-// ✅ Cyan info box
-<div className="p-4 rounded-xl bg-cyan-500/5 border border-cyan-500/20 text-sm">
+// ✅ gauge — "কতটুকু"
+<div className="gauge h-3 w-full"><div className="gauge-fill" style={{ width: `${pct}%` }} /></div>
 
-// ✅ Neutral box
-<div className="bg-zinc-100/50 dark:bg-zinc-900/50 p-4 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50">
+// progress-mark — "কোথায়" (ধাপের ক্রমে); দুটো এক জিনিস নয়
 ```
 
-### Doc ID ও Source
-```tsx
-// ✅ Doc ID — mono, muted
-<span className="font-mono text-[10px] text-zinc-400">1.1.1</span>
-
-// ✅ Source attribution
-<span className="text-xs italic text-zinc-400 dark:text-zinc-500">Source: Anup Panwar</span>
-```
-
-### নামকরণ
-- Component file: PascalCase (`TrackerClient.tsx`, `DocCard.tsx`)
-- Function/hook: camelCase (`useLocalStorage`, `getPartProgress`)
-- CSS class: lowercase kebab (`.glass-panel`, `.glass-glow`)
-- Prop: camelCase (`isRead`, `needsRevise`, `chapterName`)
-
+### আইকন
+`lucide-react` ব্যবহার করুন, ইমোজি নয় — ইমোজি নিজের রঙ নিয়ে আসে, যা থিমের নিয়ন্ত্রণের বাইরে।
 ---
 
 ## ৪. ইন্টারঅ্যাকশন নিয়ম (Interaction Rules)

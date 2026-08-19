@@ -3,7 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useMemo } from "react";
-import { Activity, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import {
+  Activity,
+  ChevronDown,
+  ChevronRight,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  X,
+} from "lucide-react";
+import useLocalStorage from "@/app/hooks/useLocalStorage";
 import type { NavTree } from "@/app/lib/content";
 
 function normalize(path: string): string {
@@ -14,6 +23,10 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
   const pathname = normalize(usePathname());
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState("");
+  /* Collapsing is a desktop-only affordance — on a phone the rack is already
+     behind the top bar. It persists because the reason to collapse it (the
+     simulator wants the width) outlives a single navigation. */
+  const [collapsed, setCollapsed] = useLocalStorage<boolean>("sd_nav_collapsed", false);
 
   // Determine which sections/parts should be open initially
   const initialOpenParts = useMemo(() => {
@@ -96,29 +109,55 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
         </button>
       </div>
 
+      {/* Collapsed rail — the only way back to the rack on a wide screen */}
+      {collapsed && (
+        <div className="hidden md:flex shrink-0 flex-col items-center gap-2 surface-panel px-2 py-3">
+          <button
+            type="button"
+            onClick={() => setCollapsed(false)}
+            className="control control--quiet p-1.5"
+            aria-label="সূচিপত্র খুলুন"
+            aria-expanded={false}
+          >
+            <PanelLeftOpen size={16} />
+          </button>
+        </div>
+      )}
+
       {/* The index rack */}
       <nav
-        className={`${
-          mobileOpen ? "flex" : "hidden"
-        } md:flex shrink-0 min-h-0 flex-1 md:flex-none flex-col md:w-80 surface-panel overflow-y-auto`}
+        className={`${mobileOpen ? "flex" : "hidden"} ${
+          collapsed ? "md:hidden" : "md:flex"
+        } shrink-0 min-h-0 flex-1 md:flex-none flex-col md:w-80 surface-panel overflow-y-auto`}
       >
         <div className="p-4 flex flex-col gap-4">
           {/* Brand */}
           <div className="flex items-start justify-between gap-2">
             <Link href="/" onClick={() => setMobileOpen(false)} className="block min-w-0">
               <div className="t-title text-base">System Design</div>
-              <p className="t-label mt-1">রোডম্যাপ ও ল্যাবস গাইড</p>
             </Link>
 
-            <Link
-              href="/progress/"
-              onClick={() => setMobileOpen(false)}
-              className={`control px-2.5 py-1 text-[11px] ${
-                pathname === "/progress" ? "control--primary" : ""
-              }`}
-            >
-              প্রোগ্রেস
-            </Link>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Link
+                href="/progress/"
+                onClick={() => setMobileOpen(false)}
+                className={`control px-2.5 py-1 text-[11px] ${
+                  pathname === "/progress" ? "control--primary" : ""
+                }`}
+              >
+                Progress
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => setCollapsed(true)}
+                className="control control--quiet hidden md:inline-flex p-1.5"
+                aria-label="সূচিপত্র লুকান"
+                aria-expanded
+              >
+                <PanelLeftClose size={16} />
+              </button>
+            </div>
           </div>
 
           {/* The simulator — the one destination here that is not a document */}

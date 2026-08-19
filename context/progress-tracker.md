@@ -148,3 +148,29 @@ _কিছু নেই — ফেজ ০ ও ফেজ ১ সম্পূর�
 | **মোট** | **17** | **35** | **0** | **0%** |
 
 > এই টেবিল ম্যানুয়ালি আপডেট করুন অথবা app তৈরি হলে UI থেকে দেখুন।
+
+---
+
+## সিমুলেটর merge + control-room রূপান্তর (২০২৬-০৮-১৯)
+
+`system_design_simulation` প্রজেক্ট এই রিপোতে মিশিয়ে দেওয়া হয়েছে, এবং পুরো সাইট control-room design system-এ রূপান্তরিত।
+
+### কী হয়েছে
+- [x] সিমুলেটরের সব কোড কপি — `app/simulation/`, `app/components/simulation/`, `app/components/ui/`, `app/lib/simulations/`, `app/lib/types.ts`, `useSimulation` / `useThemeNumber` / `useMediaQuery`
+- [x] `@xyflow/react` + `lucide-react` যোগ; `@tailwindcss/typography` বাদ (আর ব্যবহার হয় না)
+- [x] `app/globals.css` = theme contract (role class) + নতুন `.doc-prose` ও `.gauge` ব্লক
+- [x] `app/themes/control-room.css` — নতুন `--t-doc-*`, `--t-gauge-*`, `--t-diagram-*` টোকেন; `--t-font-sans`-এ Bengali fallback
+- [x] ফন্ট শেল্ফ ৫ family (Archivo, Archivo Black, Barlow Semi Condensed, JetBrains Mono, Noto Sans Bengali)
+- [x] শেল পুনর্গঠন — `h-dvh overflow-hidden`, sidebar ও main আলাদা scroll; `/simulation/` `h-full` নেয়
+- [x] সব SD কম্পোনেন্ট role class-এ: `Sidebar`, `DocArticle`, `Markdown`, `MermaidDiagram`, `DocTracker`, `ProgressClient`, `page.tsx`, `layout.tsx`
+- [x] সাইডবার desktop-এ collapse করা যায় (`sd_nav_collapsed`)
+- [x] `MermaidDiagram` — dark-mode observer বাদ, এখন `--t-diagram-*` পড়ে `themeVariables` বানায়
+- [x] `npm run build` (৬৫ রুট), `npm run lint`, `npm run check:diagrams` (৪৬/৪৬) — তিনটাই পাস
+
+### সচেতন সিদ্ধান্ত
+- সাইট **dark-only** — control-room-এ light mode নেই; `dark:` variant ও theme script সম্পূর্ণ বাদ
+- পুরো সাইট control-room টাইপোগ্রাফিতে, doc body-সহ (ডেভেলপারের সিদ্ধান্ত)
+- `.doc-prose` কনট্র্যাক্টের একমাত্র raw-element ব্যতিক্রম — Markdown-এ role class বসানোর কম্পোনেন্ট নেই
+
+### বাকি
+- [ ] `system_design_simulation` রিপো ও তার GitHub Pages সাইট অবসর দেওয়া (কোড কপি হয়েছে, git history আসেনি)

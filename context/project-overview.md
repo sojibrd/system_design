@@ -18,8 +18,8 @@
 |--------|----------|
 | Framework | Next.js 16.2 (App Router, Turbopack) |
 | Language | TypeScript |
-| Styling | Tailwind CSS v4 |
-| Font | Geist Sans + Geist Mono (next/font) |
+| Styling | Tailwind CSS v4 (লেআউট) + theme contract role class (চেহারা) |
+| Font | Barlow Semi Condensed + JetBrains Mono + Noto Sans Bengali |
 | Data Source | `context/system_design_workbook/**/*.md` (nested Markdown, server-side পার্স) |
 | State | React `useState` + `useLocalStorage` hook |
 | Storage | Browser `localStorage` (progress, notes, revise flags, dark mode) |
@@ -29,6 +29,15 @@
 >
 > ⚠️ **Next 15 নয়, Next 16।** পরিকল্পনায় Next 15 লেখা ছিল, কিন্তু `create-next-app@latest` এখন Next 16.2.11 + React 19.2 দেয়। Next 16-এ breaking change আছে — কোড লেখার আগে `node_modules/next/dist/docs/` পড়ুন (`AGENTS.md`-এও এই নিয়ম আছে)। DSA Prep Tracker Next 15-এ, তাই দুই প্রজেক্টের API হুবহু এক নয়।
 
+## সিমুলেটর (`/simulation/`)
+
+২০২৬-০৮-১৯-এ `system_design_simulation` প্রজেক্ট এই অ্যাপে মিশে গেছে। React Flow (`@xyflow/react`) দিয়ে আর্কিটেকচার ডায়াগ্রামের ধাপে ধাপে অ্যানিমেটেড সিমুলেশন — URL Shortener তিনটি লেভেলে (functional / reliable / scalable), Shorten ও Redirect দুই ফ্লো।
+
+- ডেটা: `app/lib/simulations/` — nodes, edges, steps; **রঙ নেই, শুধু অর্থ** (`particleColor: "success"`)
+- সাইটের একই shell ও একই theme contract ব্যবহার করে; আলাদা build বা আলাদা Pages সাইট নেই
+- আগের রিপো (`system_design_simulation`) ও তার Pages সাইট অবসরপ্রাপ্ত
+
+---
 ## ডেটা সোর্সের কাঠামো (গুরুত্বপূর্ণ পার্থক্য)
 
 DSA Prep Tracker-এ ডেটা ছিল **একটামাত্র** `dsa-workbook.md` ফাইল। এখানে ডেটা **multi-file ও nested** — ৪ স্তরের:

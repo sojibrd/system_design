@@ -89,7 +89,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
       .filter((part) => part.chapters.length > 0);
   }, [nav.workbook.parts, query, isSearching]);
 
-  const simulationActive = pathname === "/simulation";
+  const simulationActive = pathname === "/simulation" || pathname.startsWith("/simulation/");
 
   return (
     <>

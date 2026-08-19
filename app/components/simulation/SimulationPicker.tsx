@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { SimulationConfig } from "@/app/lib/types";
+import { SimulationSummary } from "@/app/lib/types";
 import { Check, ChevronDown, Cpu } from "lucide-react";
 
 /**
@@ -13,7 +13,7 @@ import { Check, ChevronDown, Cpu } from "lucide-react";
  * of tabs would just leave the reader guessing which row means what.
  */
 export const SimulationPicker: React.FC<{
-  simulations: SimulationConfig[];
+  simulations: SimulationSummary[];
   currentId: string;
   onSelect: (id: string) => void;
 }> = ({ simulations, currentId, onSelect }) => {

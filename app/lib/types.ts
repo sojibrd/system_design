@@ -159,12 +159,24 @@ export interface LevelConfig {
  * that teach it something — three is a perfectly valid architecture story, and
  * an empty "Global" tab would be worse than no tab at all.
  */
-export interface SimulationConfig {
-  /** Stable slug — also the future route segment. */
+export interface SimulationConfig extends SimulationSummary {
+  /** Ordered functional → global. First entry is the default level. */
+  levels: LevelConfig[];
+}
+
+/**
+ * What the picker needs to list a simulation — and nothing more.
+ *
+ * A full config carries every node, edge and step of every level; one system
+ * is well over a hundred kilobytes of it. The picker has to know about ALL of
+ * them while the page renders exactly ONE, so the list it reads is this
+ * summary instead. That is what keeps a tenth simulation from being paid for
+ * on the first load of the other nine.
+ */
+export interface SimulationSummary {
+  /** Stable slug — also the route segment: `/simulation/<id>/`. */
   id: string;
   name: string;
   /** One line describing the problem, shown in the picker. */
   tagline: string;
-  /** Ordered functional → global. First entry is the default level. */
-  levels: LevelConfig[];
 }

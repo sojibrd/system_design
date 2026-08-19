@@ -174,3 +174,12 @@ _কিছু নেই — ফেজ ০ ও ফেজ ১ সম্পূর�
 
 ### বাকি
 - [ ] `system_design_simulation` রিপো ও তার GitHub Pages সাইট অবসর দেওয়া (কোড কপি হয়েছে, git history আসেনি)
+
+### সিমুলেটর রাউটিং (২০২৬-০৮-১৯, পরের ধাপ)
+
+- [x] `app/simulation/[sim]/page.tsx` — `generateStaticParams`, `dynamicParams = false`, per-route metadata
+- [x] `app/simulation/page.tsx` — ডিফল্ট সিমুলেশন (static export-এ redirect সম্ভব নয়, তাই মেনু নয়, সরাসরি প্রথমটি)
+- [x] UI `app/components/simulation/SimulationView.tsx`-এ সরানো; সিমুলেশন নির্বাচন এখন `router.push`, `useState` নয়
+- [x] `SimulationSummary` টাইপ + `simulationIndex` / `loadSimulation` — picker নাম পায়, রুট শুধু নিজের ডেটা লোড করে (per-sim chunk)
+- [x] মোবাইলে সিমুলেটরের ident লুকানো; picker থাকে
+- [x] build ৬৬ রুট, lint clean

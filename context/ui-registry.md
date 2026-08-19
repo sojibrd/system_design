@@ -28,8 +28,9 @@
 
 | ফাইল | উদ্দেশ্য | টাইপ |
 |------|---------|------|
-| `app/simulation/page.tsx` | সিমুলেটরের সম্পূর্ণ UI অর্কেস্ট্রেশন (`h-full`, সাইট শেলের ভেতরে) | Client Component |
-| `app/simulation/layout.tsx` | শুধু route metadata | Server Component |
+| `app/simulation/page.tsx` | ডিফল্ট সিমুলেশন লোড করে (`/simulation/`) | Server Component |
+| `app/simulation/[sim]/page.tsx` | প্রতি সিমুলেশনের নিজস্ব রুট — `generateStaticParams`, per-route metadata | Server Component |
+| `app/components/simulation/SimulationView.tsx` | একটি সিমুলেশনের সম্পূর্ণ UI অর্কেস্ট্রেশন (`h-full`, সাইট শেলের ভেতরে) | Client Component |
 | `app/components/simulation/FlowDiagram.tsx` | React Flow ক্যানভাস, backplane, fitView | Client Component |
 | `app/components/simulation/AnimatedEdge.tsx` | চলমান প্যাকেট ও লাইভ ওয়্যার | Client Component |
 | `app/components/simulation/SimulationNode.tsx` | একটি আর্কিটেকচার unit (`data-category`, lamp, ornament) | Client Component |
@@ -42,7 +43,8 @@
 | `app/hooks/useSimulation.ts` | ধাপ, প্লেব্যাক, node/edge derive | Custom Hook |
 | `app/hooks/useThemeNumber.ts` | থিম থেকে সংখ্যা পড়ে (SVG geometry, grid gap) | Custom Hook |
 | `app/hooks/useMediaQuery.ts` | `usePrefersReducedMotion` — অ্যানিমেশন বন্ধ করার অনুরোধ মানে | Custom Hook |
-| `app/lib/simulations/*` | সিমুলেশন ডেটা (URL Shortener × ৩ লেভেল) — **রঙ নেই, শুধু অর্থ** | Data |
+| `app/lib/simulations/index.ts` | `simulationIndex` (হালকা সারাংশ) + `loadSimulation` (per-sim dynamic import) | Registry |
+| `app/lib/simulations/<sim>/` | সিমুলেশন ডেটা (URL Shortener × ৩ লেভেল) — **রঙ নেই, শুধু অর্থ** | Data |
 | `app/lib/types.ts` | `SimulationConfig`, `LevelId`, `SignalKind` ইত্যাদি | Types |
 
 ---
@@ -55,7 +57,8 @@
 | `/docs/<slug>/` | ২৫টি রোডম্যাপ ডক |
 | `/workbook/.../<slug>/` | ৩৫টি ওয়ার্কবুক টপিক |
 | `/progress/` | স্টাডি প্রোগ্রেস ড্যাশবোর্ড |
-| `/simulation/` | আর্কিটেকচার সিমুলেটর |
+| `/simulation/` | ডিফল্ট সিমুলেশন (তালিকার প্রথমটি) |
+| `/simulation/<sim>/` | নির্দিষ্ট সিমুলেশন — লিংকযোগ্য, নিজস্ব title |
 
 > `[...slug]`-এ `dynamicParams = false`, তাই static `/simulation/` রুট নিরাপদে catch-all-এর আগে মেলে।
 
@@ -68,3 +71,15 @@
 | `sd_read_routes` | `string[]` | পঠিত ডকের route |
 | `sd_revise_routes` | `string[]` | রিভাইজ দরকার এমন route |
 | `sd_doc_notes` | `Record<string, DocNote>` | per-doc সারাংশ ও প্রশ্ন |
+| `sd_nav_collapsed` | `boolean` | ডেস্কটপে সাইডবার লুকানো আছে কিনা |
+
+---
+
+## নতুন সিমুলেশন যোগ করা
+
+১. `app/lib/simulations/<slug>/` — level ফাইল লিখুন, `<slug>/index.ts`-এ `SimulationConfig` এক্সপোর্ট করুন
+২. `app/lib/simulations/index.ts`-এ দুটো লাইন — `simulationIndex`-এ সারাংশ, `loaders`-এ dynamic import
+
+এর বেশি কিছু লাগে না: রুট (`/simulation/<slug>/`) `generateStaticParams` থেকে নিজেই তৈরি হয়, এবং `SimulationPicker` দুই বা তার বেশি এন্ট্রি দেখলে স্থির প্লেট থেকে dropdown-এ বদলে যায়।
+
+> **কেন দুটো তালিকা:** picker একটা client component, তাকে **সব** সিমুলেশনের নাম জানতে হয়; পেজ রেন্ডার করে **একটা**। একটা সিমুলেশনের পূর্ণ ডেটা ১৫০KB+ — তাই নাম যায় `simulationIndex`-এ, ডেটা আসে সেই রুটের নিজস্ব dynamic import থেকে। দশম সিমুলেশন যোগ করলে বাকি নয়টার খরচ প্রথম লোডে পড়বে না।

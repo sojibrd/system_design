@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Cpu } from "lucide-react";
-import { SimulationConfig } from "@/app/lib/types";
+import { SimulationSummary } from "@/app/lib/types";
 import { SimulationPicker } from "./SimulationPicker";
 
 export const Header: React.FC<{
-  simulations: SimulationConfig[];
+  simulations: SimulationSummary[];
   currentSimulationId: string;
   onSelectSimulation: (id: string) => void;
 }> = ({ simulations, currentSimulationId, onSelectSimulation }) => {

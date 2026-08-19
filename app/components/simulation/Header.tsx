@@ -14,7 +14,9 @@ export const Header: React.FC<{
     /* The rack header plate: ident on the left, the unit under test on the right. */
     <header className="surface-panel w-full seam-b-heavy px-4 py-2 shrink-0 z-40">
       <div className="w-full flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
+        {/* On a phone the site's own top bar already names where you are, so
+            the rack ident is redundant width — the picker keeps the row. */}
+        <div className="hidden md:flex items-center gap-2.5">
           <div className="surface-well t-accent w-8 h-8 flex items-center justify-center">
             <Cpu className="w-4 h-4" />
           </div>

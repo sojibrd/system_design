@@ -28,43 +28,7 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
      simulator wants the width) outlives a single navigation. */
   const [collapsed, setCollapsed] = useLocalStorage<boolean>("sd_nav_collapsed", false);
 
-  const [userToggles, setUserToggles] = useState<Record<string, boolean>>({});
   const [roadmapOpen, setRoadmapOpen] = useState(true);
-  const [workbookOpen, setWorkbookOpen] = useState(true);
-
-  // Active part and chapter keys for the current pathname
-  const activeKeys = useMemo(() => {
-    const set = new Set<string>();
-    for (const part of nav.workbook.parts) {
-      for (const ch of part.chapters) {
-        if (ch.items.some((it) => normalize(it.route) === pathname)) {
-          set.add(part.key);
-          set.add(`${part.key}:${ch.key}`);
-        }
-      }
-    }
-    // Default open first part if nothing matched
-    if (set.size === 0 && nav.workbook.parts.length > 0) {
-      set.add(nav.workbook.parts[0].key);
-    }
-    return set;
-  }, [nav, pathname]);
-
-  function isSectionOpen(key: string): boolean {
-    if (isSearching) return true;
-    if (userToggles[key] !== undefined) {
-      return userToggles[key];
-    }
-    return activeKeys.has(key);
-  }
-
-  function toggleOpen(key: string) {
-    const current = isSectionOpen(key);
-    setUserToggles((prev) => ({
-      ...prev,
-      [key]: !current,
-    }));
-  }
 
   // Filter items if search is active
   const isSearching = search.trim().length > 0;
@@ -76,25 +40,6 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
       item.title.toLowerCase().includes(query)
     );
   }, [nav.roadmap.items, query, isSearching]);
-
-  const filteredWorkbookParts = useMemo(() => {
-    if (!isSearching) return nav.workbook.parts;
-    return nav.workbook.parts
-      .map((part) => {
-        const filteredChapters = part.chapters
-          .map((ch) => ({
-            ...ch,
-            items: ch.items.filter((it) => it.title.toLowerCase().includes(query)),
-          }))
-          .filter((ch) => ch.items.length > 0);
-
-        return {
-          ...part,
-          chapters: filteredChapters,
-        };
-      })
-      .filter((part) => part.chapters.length > 0);
-  }, [nav.workbook.parts, query, isSearching]);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -278,13 +223,13 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
           </div>
 
           {/* Empty search state */}
-          {isSearching && filteredRoadmap.length === 0 && filteredWorkbookParts.length === 0 && (
+          {isSearching && filteredRoadmap.length === 0 && (
             <div className="surface-well t-caption p-4 text-center">
               &ldquo;{search}&rdquo; দিয়ে কোনো অধ্যায় বা রোডম্যাপ পাওয়া যায়নি।
             </div>
           )}
 
-          {/* Section 1 — Roadmap */}
+          {/* Roadmap */}
           {(!isSearching || filteredRoadmap.length > 0) && (
             <div className="flex flex-col gap-1">
               <button
@@ -318,91 +263,6 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
                     );
                   })}
                 </ul>
-              )}
-            </div>
-          )}
-
-          {/* Section 2 — Workbook */}
-          {(!isSearching || filteredWorkbookParts.length > 0) && (
-            <div className="flex flex-col gap-2 pt-2 seam-t">
-              <button
-                type="button"
-                onClick={() => setWorkbookOpen((v) => !v)}
-                aria-expanded={workbookOpen}
-                aria-controls="workbook-tree"
-                className="t-label flex w-full items-center justify-between py-1.5 sm:py-1"
-              >
-                <span>{nav.workbook.title}</span>
-                {workbookOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-              </button>
-
-              {workbookOpen && (
-                <div id="workbook-tree" className="flex flex-col gap-3">
-                  {filteredWorkbookParts.map((part) => {
-                    const partOpen = isSectionOpen(part.key);
-                    const partContentId = `part-content-${part.key}`;
-
-                    return (
-                      <div key={part.key} className="flex flex-col gap-1">
-                        <button
-                          type="button"
-                          onClick={() => toggleOpen(part.key)}
-                          aria-expanded={partOpen}
-                          aria-controls={partContentId}
-                          className="row flex w-full items-center justify-between px-2.5 py-2 sm:py-1 text-left text-xs"
-                        >
-                          <span className="truncate">{part.title}</span>
-                          {partOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
-                        </button>
-
-                        {partOpen && (
-                          <div id={partContentId} className="ml-2 flex flex-col gap-2 pl-2">
-                            {part.chapters.map((ch) => {
-                              const chKey = `${part.key}:${ch.key}`;
-                              const chOpen = isSectionOpen(chKey);
-                              const chContentId = `ch-content-${chKey}`;
-
-                              return (
-                                <div key={ch.key} className="flex flex-col gap-1">
-                                  <button
-                                    type="button"
-                                    onClick={() => toggleOpen(chKey)}
-                                    aria-expanded={chOpen}
-                                    aria-controls={chContentId}
-                                    className="row flex w-full items-center justify-between px-2.5 py-1.5 sm:py-1 text-left text-xs sm:text-[11px]"
-                                  >
-                                    <span className="truncate">{ch.title}</span>
-                                    {chOpen ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
-                                  </button>
-
-                                  {chOpen && (
-                                    <ul id={chContentId} className="ml-1 flex flex-col gap-0.5 pl-2">
-                                      {ch.items.map((item) => {
-                                        const active = normalize(item.route) === pathname;
-                                        return (
-                                          <li key={item.route}>
-                                            <Link
-                                              href={item.route}
-                                              onClick={() => setMobileOpen(false)}
-                                              aria-current={active ? "true" : undefined}
-                                              className="row block px-2.5 py-2 sm:py-1 text-xs sm:text-[11px] leading-snug"
-                                            >
-                                              {item.title}
-                                            </Link>
-                                          </li>
-                                        );
-                                      })}
-                                    </ul>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
               )}
             </div>
           )}

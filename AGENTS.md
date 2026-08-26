@@ -15,7 +15,6 @@
 
 ### Content Rules & Structure
 - `docs/` ফোল্ডারে ২৫টি রোডম্যাপ ডক (`01-introduction.md` ... `25-security.md` + `README.md`)
-- `workbook/` ফোল্ডারে নেস্টেড ওয়ার্কবুক ডক (৬টি Part → চ্যাপ্টার → টপিক)
 - `designs/` এবং `context/` ফোল্ডার বিল্ড স্ক্যানার (`content.ts`)-এ ইচ্ছাকৃতভাবে ইগনোর করা থাকে।
 - `app/lib/content.ts` সম্পূর্ণ Server-only। ক্লায়েন্ট কম্পোনেন্ট থেকে কখনো ইম্পোর্ট করবেন না।
 

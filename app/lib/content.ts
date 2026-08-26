@@ -20,7 +20,7 @@ const IGNORED_DIRS = new Set([
 ]);
 
 export type Doc = {
-  /** URL segments, e.g. ["docs", "01-introduction"] or ["workbook", "1-networking-basics", "1-1-url-and-browser", "1-1-1-parts-of-a-url"] */
+  /** URL segments, e.g. ["docs", "01-introduction"] */
   slug: string[];
   /** trailing slash সহ সাইট-route, e.g. "/docs/01-introduction/" */
   route: string;
@@ -28,8 +28,8 @@ export type Doc = {
   file: string;
   /** ফাইলটা যে ফোল্ডারে আছে, e.g. "docs" */
   dir: string;
-  /** টপ-লেভেল সেকশন: "docs" (Roadmap) বা "workbook" (Workbook) */
-  section: "docs" | "workbook" | string;
+  /** টপ-লেভেল ফোল্ডার — বর্তমানে সব ডক "docs"-এ */
+  section: string;
   /** সরাসরি parent ফোল্ডারের নাম */
   group: string;
   /** প্রথম `# heading` অথবা ফাইলনাম থেকে */
@@ -44,27 +44,10 @@ export type NavItem = {
   file: string;
 };
 
-export type NavChapter = {
-  title: string;
-  key: string;
-  items: NavItem[];
-};
-
-export type NavPart = {
-  title: string;
-  key: string;
-  chapters: NavChapter[];
-  items?: NavItem[];
-};
-
 export type NavTree = {
   roadmap: {
     title: string;
     items: NavItem[];
-  };
-  workbook: {
-    title: string;
-    parts: NavPart[];
   };
 };
 
@@ -266,7 +249,6 @@ export function parseDocContent(raw: string): {
 }
 
 export function getNav(): NavTree {
-  const { indexTitles } = scanAll();
   const pages = getPages();
 
   // 1. Roadmap (docs/)
@@ -277,69 +259,10 @@ export function getNav(): NavTree {
     file: p.file,
   }));
 
-  // 2. Workbook (workbook/)
-  const workbookPages = pages.filter((p) => p.section === "workbook");
-  const partMap = new Map<string, { partTitle: string; chapterMap: Map<string, { chapterTitle: string; items: NavItem[] }> }>();
-
-  for (const page of workbookPages) {
-    const parts = page.file.split("/");
-    // e.g. ["workbook", "1. Networking basics", "1.1 URL and Browser", "1.1.1 Parts of a URL.md"]
-    const partFolder = parts[1] || "";
-    const chapterFolder = parts[2] || "";
-
-    const partPath = `workbook/${partFolder}`;
-    const chapterPath = `workbook/${partFolder}/${chapterFolder}`;
-
-    const partTitle = indexTitles.get(partPath) || partFolder.replace(/^\d+[-_.]\s*/, "");
-    const chapterTitle = indexTitles.get(chapterPath) || chapterFolder.replace(/^\d+(\.\d+)?[-_.]\s*/, "");
-
-    if (!partMap.has(partFolder)) {
-      partMap.set(partFolder, {
-        partTitle,
-        chapterMap: new Map(),
-      });
-    }
-
-    const partEntry = partMap.get(partFolder)!;
-    if (!partEntry.chapterMap.has(chapterFolder)) {
-      partEntry.chapterMap.set(chapterFolder, {
-        chapterTitle,
-        items: [],
-      });
-    }
-
-    partEntry.chapterMap.get(chapterFolder)!.items.push({
-      title: page.title,
-      route: page.route,
-      file: page.file,
-    });
-  }
-
-  const workbookParts: NavPart[] = [];
-  for (const [partKey, partData] of partMap) {
-    const chapters: NavChapter[] = [];
-    for (const [chapterKey, chapterData] of partData.chapterMap) {
-      chapters.push({
-        title: chapterData.chapterTitle,
-        key: chapterKey,
-        items: chapterData.items,
-      });
-    }
-    workbookParts.push({
-      title: partData.partTitle,
-      key: partKey,
-      chapters,
-    });
-  }
-
   return {
     roadmap: {
       title: "System Design Roadmap",
       items: roadmapItems,
-    },
-    workbook: {
-      title: "System Design Workbook",
-      parts: workbookParts,
     },
   };
 }

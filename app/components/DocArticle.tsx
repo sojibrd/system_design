@@ -27,7 +27,6 @@ export default function DocArticle({
   next?: Doc;
 }) {
   const router = useRouter();
-  const isWorkbook = doc.section === "workbook";
 
   // Keyboard navigation shortcuts: `[` for prev, `]` for next
   useEffect(() => {
@@ -62,7 +61,7 @@ export default function DocArticle({
         <header className="mb-8 seam-b pb-6">
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="chip">
-              {isWorkbook ? "Workbook · ল্যাব ও প্র্যাকটিস" : "Roadmap · কোর আর্কিটেকচার"}
+              Roadmap · কোর আর্কিটেকচার
             </span>
             {doc.group && <span className="t-label truncate">{doc.group}</span>}
           </div>

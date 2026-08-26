@@ -55,11 +55,11 @@ const bengali = Noto_Sans_Bengali({
 
 export const metadata: Metadata = {
   title: {
-    default: "System Design — বাংলা রোডম্যাপ ও ওয়ার্কবুক",
+    default: "System Design — বাংলা রোডম্যাপ ও সিমুলেটর",
     template: "%s — System Design",
   },
   description:
-    "সিস্টেম ডিজাইন শেখা ও ইন্টারভিউ প্রস্তুতির সম্পূর্ণ বাংলা রোডম্যাপ, ইন্টারঅ্যাকটিভ ওয়ার্কবুক এবং আর্কিটেকচার সিমুলেটর।",
+    "সিস্টেম ডিজাইন শেখা ও ইন্টারভিউ প্রস্তুতির সম্পূর্ণ বাংলা রোডম্যাপ এবং ইন্টারঅ্যাকটিভ আর্কিটেকচার সিমুলেটর।",
 };
 
 export default function RootLayout({

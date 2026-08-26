@@ -754,7 +754,7 @@ body {
 /* ---------------------------------------------------------------------------
    DOC PROSE
 
-   The roadmap and workbook are long-form Markdown, rendered by react-markdown
+   The roadmap docs are long-form Markdown, rendered by react-markdown
    straight into semantic tags. There is no component to hang a role class on
    for each `<h2>` or `<td>`, so this is the one place the contract addresses
    raw elements — scoped under `.doc-prose` and reading `--t-doc-*` only.

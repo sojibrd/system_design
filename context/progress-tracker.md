@@ -192,3 +192,20 @@ _কিছু নেই — ফেজ ০ ও ফেজ ১ সম্পূর�
 - [x] রেজিস্ট্রিতে দুই লাইন — রুট `/simulation/rate-limiter/` নিজে থেকেই তৈরি, picker স্বয়ংক্রিয়ভাবে dropdown হয়ে গেছে
 - [x] `scripts/check-simulations.mjs` + `npm run check:simulations` — step-এর node/edge রেফারেন্স, flowType মিল ও `componentCount` যাচাই করে (এটাই `componentCount` ভুল ধরেছিল)
 - [x] ডেটা ফাইলগুলো `import type`-এ — Node-এর type stripping দিয়ে স্ক্রিপ্ট চালানোর জন্য দরকারি, এবং এটাই সঠিক রূপ
+
+### Workbook অপসারণ (২০২৬-০৮-২৬)
+
+- [x] `workbook/` ফোল্ডার (৬ Part → ১৭ Chapter → ৩৫ টপিক) ডিস্ক থেকে ডিলিট
+- [x] `app/lib/content.ts` — workbook nav-বিল্ড, `NavTree.workbook`, `NavPart`/`NavChapter` টাইপ বাদ; `Doc.section` ফিল্ড রাখা (রুট ডেরাইভেশনে ব্যবহৃত)
+- [x] `Sidebar.tsx` — Workbook সেকশন, `workbookOpen`/`userToggles` state, `activeKeys`/`isSectionOpen`/`toggleOpen`, part/chapter ফিল্টার সরানো; সাইডবারে এখন শুধু Roadmap তালিকা
+- [x] `DocArticle.tsx` — `isWorkbook` ব্যাজ সরিয়ে স্থির "Roadmap · কোর আর্কিটেকচার"
+- [x] `progress/` — Workbook সেকশন ও filter option বাদ, একটাই সেকশন
+- [x] `scripts/check-diagrams.mjs` — `DIRS` থেকে `workbook` বাদ
+- [x] README, AGENTS.md (প্রজেক্ট ও root), ui-registry, ui-rules আপডেট
+- [x] build ৩২ রুট (২৫ docs + / + /progress + /simulation ×৩ + 404), lint ও tsc clean
+- ⚠️ localStorage-এ পুরনো workbook progress/notes key orphan থেকে গেছে — মাইগ্রেট করা হয়নি
+- [x] রিভিউ-পরবর্তী ফলো-আপ: `layout.tsx` metadata (title/description) থেকে "ওয়ার্কবুক" সরানো, `ui-tokens.md` ও `ui-registry.md`-এর বাসি বর্ণনা ঠিক করা
+- [x] `/progress` — মৃত সেকশন-ফিল্টার dropdown, এক-সেকশনের per-section breakdown, ধ্রুবক "Roadmap" chip ও `ProgressSectionData` টাইপ সরানো; `page.tsx` এখন শুধু `allDocs` পাঠায়
+- [x] `ProgressClient` — মাউন্টে একবার orphan localStorage রুট prune (ছাঁটার মতো কিছু না থাকলে storage-এ লেখা হয় না)
+- [x] `Doc.section` টাইপ `"docs" | string` → `string` (আগের union কার্যত `string`-এই widen হতো)
+

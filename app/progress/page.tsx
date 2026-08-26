@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getPages } from "@/app/lib/content";
-import ProgressClient, { type ProgressDocItem, type ProgressSectionData } from "./ProgressClient";
+import ProgressClient, { type ProgressDocItem } from "./ProgressClient";
 
 export const metadata: Metadata = {
   title: "স্টাডি প্রোগ্রেস ও রিভিশন",
@@ -10,26 +10,13 @@ export const metadata: Metadata = {
 export default function ProgressPage() {
   const pages = getPages();
 
-  const allDocs: ProgressDocItem[] = pages.map((p) => ({
-    title: p.title,
-    route: p.route,
-    section: p.section,
-    group: p.group,
-  }));
+  const allDocs: ProgressDocItem[] = pages
+    .filter((p) => p.section === "docs")
+    .map((p) => ({
+      title: p.title,
+      route: p.route,
+      group: p.group,
+    }));
 
-  const roadmapDocs = allDocs.filter((d) => d.section === "docs");
-  const workbookDocs = allDocs.filter((d) => d.section === "workbook");
-
-  const sections: ProgressSectionData[] = [
-    {
-      title: "System Design Roadmap (২৫টি অধ্যায়)",
-      docs: roadmapDocs,
-    },
-    {
-      title: "System Design Workbook (৩৫টি টপিক)",
-      docs: workbookDocs,
-    },
-  ];
-
-  return <ProgressClient sections={sections} allDocs={allDocs} />;
+  return <ProgressClient allDocs={allDocs} />;
 }

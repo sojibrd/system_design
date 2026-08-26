@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Circle, RotateCcw } from "lucide-react";
 import useLocalStorage from "@/app/hooks/useLocalStorage";
@@ -9,30 +9,32 @@ import type { DocNote } from "@/app/components/DocTracker";
 export interface ProgressDocItem {
   title: string;
   route: string;
-  section: string;
   group: string;
-}
-
-export interface ProgressSectionData {
-  title: string;
-  docs: ProgressDocItem[];
 }
 
 type Filter = "all" | "revise" | "unread" | "notes";
 
-export default function ProgressClient({
-  sections,
-  allDocs,
-}: {
-  sections: ProgressSectionData[];
-  allDocs: ProgressDocItem[];
-}) {
+export default function ProgressClient({ allDocs }: { allDocs: ProgressDocItem[] }) {
   const [readRoutes, setReadRoutes] = useLocalStorage<string[]>("sd_read_routes", []);
   const [reviseRoutes, setReviseRoutes] = useLocalStorage<string[]>("sd_revise_routes", []);
   const [notesMap] = useLocalStorage<Record<string, DocNote>>("sd_doc_notes", {});
 
   const [activeFilter, setActiveFilter] = useState<Filter>("all");
-  const [activeSection, setActiveSection] = useState<string>("all");
+
+  /* Workbook চলে যাওয়ায় ব্যবহারকারীর localStorage-এ মুছে যাওয়া রুটের এন্ট্রি
+     রয়ে যেতে পারে। গণনা `allDocs` থেকে হয় বলে সংখ্যা ভুল হয় না, কিন্তু ডেটা
+     অনির্দিষ্টকাল জমে থাকার কারণ নেই — একবার ছেঁটে দেওয়া হয়। ছাঁটার মতো কিছু
+     না থাকলে কোনো লেখা হয় না, তাই এটি প্রতি মাউন্টে storage স্পর্শ করে না। */
+  useEffect(() => {
+    const live = new Set(allDocs.map((d) => d.route));
+    const hasOrphan = (routes: string[]) => routes.some((r) => !live.has(r));
+    if (hasOrphan(readRoutes)) {
+      setReadRoutes((prev) => prev.filter((r) => live.has(r)));
+    }
+    if (hasOrphan(reviseRoutes)) {
+      setReviseRoutes((prev) => prev.filter((r) => live.has(r)));
+    }
+  }, [allDocs, readRoutes, reviseRoutes, setReadRoutes, setReviseRoutes]);
 
   const total = allDocs.length;
   const readCount = allDocs.filter((d) => readRoutes.includes(d.route)).length;
@@ -58,11 +60,6 @@ export default function ProgressClient({
 
   const filteredDocs = useMemo(() => {
     return allDocs.filter((doc) => {
-      // Section filter
-      if (activeSection !== "all" && doc.section !== activeSection) {
-        return false;
-      }
-      // Status filter
       const isRead = readRoutes.includes(doc.route);
       const isRevise = reviseRoutes.includes(doc.route);
       const hasNote = Boolean(
@@ -74,7 +71,7 @@ export default function ProgressClient({
       if (activeFilter === "notes") return hasNote;
       return true;
     });
-  }, [allDocs, activeSection, activeFilter, readRoutes, reviseRoutes, notesMap]);
+  }, [allDocs, activeFilter, readRoutes, reviseRoutes, notesMap]);
 
   const filters: { id: Filter; label: string; count: number }[] = [
     { id: "all", label: "সব অধ্যায়", count: total },
@@ -139,41 +136,11 @@ export default function ProgressClient({
         >
           <div className="gauge-fill" style={{ width: `${percentage}%` }} />
         </div>
-
-        {/* Per-section breakdown */}
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 seam-t">
-          {sections.map((sec) => {
-            const secRead = sec.docs.filter((d) => readRoutes.includes(d.route)).length;
-            const secTotal = sec.docs.length;
-            const secPct = secTotal > 0 ? Math.round((secRead / secTotal) * 100) : 0;
-
-            return (
-              <div key={sec.title} className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="t-body text-xs truncate">{sec.title}</span>
-                  <span className="t-mono t-muted text-xs shrink-0">
-                    {secRead}/{secTotal} ({secPct}%)
-                  </span>
-                </div>
-                <div
-                  role="progressbar"
-                  aria-valuenow={secPct}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={`${sec.title} সম্পূর্ণতা`}
-                  className="gauge h-2 w-full"
-                >
-                  <div className="gauge-fill" data-tone="ok" style={{ width: `${secPct}%` }} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div className="segment-group max-w-full overflow-x-auto flex-nowrap shrink-0">
+      <div className="mb-6">
+        <div className="segment-group max-w-full overflow-x-auto flex-nowrap">
           {filters.map((f) => (
             <button
               key={f.id}
@@ -185,22 +152,6 @@ export default function ProgressClient({
               {f.label} ({f.count})
             </button>
           ))}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <label htmlFor="progress-section-filter" className="t-label shrink-0">
-            সেকশন
-          </label>
-          <select
-            id="progress-section-filter"
-            value={activeSection}
-            onChange={(e) => setActiveSection(e.target.value)}
-            className="control px-3 py-1.5 text-xs min-h-10 sm:min-h-0"
-          >
-            <option value="all">সব সেকশন</option>
-            <option value="docs">Roadmap</option>
-            <option value="workbook">Workbook</option>
-          </select>
         </div>
       </div>
 
@@ -223,12 +174,7 @@ export default function ProgressClient({
                 className="surface-panel flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="chip">
-                      {doc.section === "docs" ? "Roadmap" : "Workbook"}
-                    </span>
-                    {doc.group && <span className="t-label truncate">{doc.group}</span>}
-                  </div>
+                  {doc.group && <span className="t-label mb-1 block truncate">{doc.group}</span>}
                   <Link href={doc.route} className="t-strong block text-sm truncate">
                     {doc.title}
                   </Link>

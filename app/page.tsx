@@ -8,7 +8,7 @@ export default function Home() {
   if (!doc) {
     return (
       <div className="mx-auto w-full max-w-4xl px-6 py-12">
-        <h1 className="t-title text-3xl">System Design Roadmap &amp; Workbook</h1>
+        <h1 className="t-title text-3xl">System Design Roadmap</h1>
         <p className="t-body mt-2 text-sm">
           {pages.length} টি বিস্তারিত অধ্যায় — বাঁ পাশের সূচিপত্র থেকে শুরু করুন।
         </p>

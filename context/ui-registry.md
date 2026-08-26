@@ -13,7 +13,7 @@
 | `app/[...slug]/page.tsx` | ৬০টি ডকের স্ট্যাটিক রুট জেনারেটর ও পেজ রেন্ডারার | Server Component |
 | `app/progress/page.tsx` | প্রোগ্রেস পেজ ডাটা লোডার | Server Component |
 | `app/progress/ProgressClient.tsx` | প্রোগ্রেস ও রিভিশন ড্যাশবোর্ড (readout, `gauge`, `segment-group` ফিল্টার) | Client Component |
-| `app/components/Sidebar.tsx` | কোলাপসিবল রোডম্যাপ তালিকা, সার্চ, সিমুলেশন লিংক | Client Component |
+| `app/components/Sidebar.tsx` | সবসময়-দৃশ্যমান রোডম্যাপ তালিকা, সার্চ, সিমুলেশন লিংক | Client Component |
 | `app/components/DocArticle.tsx` | আর্টিকেল হেডার, সোর্স মেটা, বডি, ট্র্যাকার ও পেজিনেশন | Server/Client Composite |
 | `app/components/Markdown.tsx` | ReactMarkdown, রিলেটিভ লিংক ও Mermaid হ্যান্ডলিং — **কোনো স্টাইল নেই**, শুধু `.doc-prose` র‍্যাপার | Client Component |
 | `app/components/MermaidDiagram.tsx` | Mermaid SVG রেন্ডারার; `--t-diagram-*` পড়ে `themeVariables` বানায় | Client Component |

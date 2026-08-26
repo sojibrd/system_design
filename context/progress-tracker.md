@@ -208,4 +208,5 @@ _কিছু নেই — ফেজ ০ ও ফেজ ১ সম্পূর�
 - [x] `/progress` — মৃত সেকশন-ফিল্টার dropdown, এক-সেকশনের per-section breakdown, ধ্রুবক "Roadmap" chip ও `ProgressSectionData` টাইপ সরানো; `page.tsx` এখন শুধু `allDocs` পাঠায়
 - [x] `ProgressClient` — মাউন্টে একবার orphan localStorage রুট prune (ছাঁটার মতো কিছু না থাকলে storage-এ লেখা হয় না)
 - [x] `Doc.section` টাইপ `"docs" | string` → `string` (আগের union কার্যত `string`-এই widen হতো)
+- [x] সাইডবার অ্যাকর্ডিয়ন সরানো — হেডার বাটন, chevron ও `roadmapOpen` state বাদ; রোডম্যাপ তালিকা এখন সবসময় দৃশ্যমান। সাথে অব্যবহৃত `NavTree.roadmap.title` ফিল্ডও বাদ
 

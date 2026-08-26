@@ -5,8 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState, useMemo, useEffect, useRef } from "react";
 import {
   Activity,
-  ChevronDown,
-  ChevronRight,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
@@ -27,8 +25,6 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
      behind the top bar. It persists because the reason to collapse it (the
      simulator wants the width) outlives a single navigation. */
   const [collapsed, setCollapsed] = useLocalStorage<boolean>("sd_nav_collapsed", false);
-
-  const [roadmapOpen, setRoadmapOpen] = useState(true);
 
   // Filter items if search is active
   const isSearching = search.trim().length > 0;
@@ -229,42 +225,25 @@ export default function Sidebar({ nav }: { nav: NavTree }) {
             </div>
           )}
 
-          {/* Roadmap */}
-          {(!isSearching || filteredRoadmap.length > 0) && (
-            <div className="flex flex-col gap-1">
-              <button
-                type="button"
-                onClick={() => setRoadmapOpen((v) => !v)}
-                aria-expanded={roadmapOpen}
-                aria-controls="roadmap-list"
-                className="t-label flex w-full items-center justify-between py-1.5 sm:py-1"
-              >
-                <span>
-                  {nav.roadmap.title} ({filteredRoadmap.length})
-                </span>
-                {roadmapOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-              </button>
-
-              {roadmapOpen && (
-                <ul id="roadmap-list" className="flex flex-col gap-0.5 pl-2">
-                  {filteredRoadmap.map((item) => {
-                    const active = normalize(item.route) === pathname;
-                    return (
-                      <li key={item.route}>
-                        <Link
-                          href={item.route}
-                          onClick={() => setMobileOpen(false)}
-                          aria-current={active ? "true" : undefined}
-                          className="row block px-2.5 py-2 sm:py-1.5 text-xs leading-snug"
-                        >
-                          {item.title}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
+          {/* Roadmap — একটাই সেকশন, তাই তালিকা সবসময় খোলা */}
+          {filteredRoadmap.length > 0 && (
+            <ul className="flex flex-col gap-0.5">
+              {filteredRoadmap.map((item) => {
+                const active = normalize(item.route) === pathname;
+                return (
+                  <li key={item.route}>
+                    <Link
+                      href={item.route}
+                      onClick={() => setMobileOpen(false)}
+                      aria-current={active ? "true" : undefined}
+                      className="row block px-2.5 py-2 sm:py-1.5 text-xs leading-snug"
+                    >
+                      {item.title}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           )}
         </div>
       </nav>

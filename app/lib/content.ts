@@ -46,7 +46,6 @@ export type NavItem = {
 
 export type NavTree = {
   roadmap: {
-    title: string;
     items: NavItem[];
   };
 };
@@ -261,7 +260,6 @@ export function getNav(): NavTree {
 
   return {
     roadmap: {
-      title: "System Design Roadmap",
       items: roadmapItems,
     },
   };
